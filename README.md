@@ -1,5 +1,5 @@
 # axonops-workbench-containers
-A project for generating the conatiner images used in AxonOps Workbench
+A project for generating the container images used in AxonOps Workbench
 
 ***
 
