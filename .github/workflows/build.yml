@@ -90,8 +90,11 @@ jobs:
 
       - name: Generate manitest
         run: |
-          sudo apt-get update && sudo apt-get -y install jq
+          set -x
 
           jq -n \
-            --argjson ${{ env.CASS5_VERSION }} "$(jq -n --arg digest '${{ steps.build5.outputs.digest }}' --arg image '${{ steps.build5.outputs.imageid }}' --arg sha '${{ github.sha }}' $ARGS.named')" \
+            --argjson cass5_version "${{ env.CASS5_VERSION }}" \
+            --arg digest "${{ steps.build5.outputs.digest }}" \
+            --arg image "${{ steps.build5.outputs.imageid }}" \
+            --arg sha "${{ github.sha }}" \
             '$ARGS.named' > manifest.json
