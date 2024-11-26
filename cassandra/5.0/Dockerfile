@@ -174,7 +174,7 @@ COPY docker-entrypoint.sh /usr/local/bin/
 EXPOSE 7000 7001 7199 9042 9160
 
 ENV AXON_AGENT_LOG_OUTPUT=std
-ARG MAJOR_VERSION=5.0
+ENV MAJOR_VERSION=5.0
 
 RUN AGENT_VER=$(echo "$CASSANDRA_VERSION" | sed -r 's/^([0-9]+\.[0-9]+).*$/\1/') && \
     groupadd --gid 9988 axonops && \
