@@ -32,7 +32,7 @@ jobs:
 
           echo "versions50=$versions50" >> $GITHUB_OUTPUT
           
-      - run: echo "${{ steps.cassandra_versions.outputs.versions50 }}" | jq -r .
+      - run: echo ${{ steps.cassandra_versions.outputs.versions50 }} | jq -r .
 
   build:
     name: Build containers
