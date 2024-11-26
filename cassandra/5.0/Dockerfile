@@ -174,6 +174,7 @@ COPY docker-entrypoint.sh /usr/local/bin/
 EXPOSE 7000 7001 7199 9042 9160
 
 ENV AXON_AGENT_LOG_OUTPUT=std
+ARG MAJOR_VERSION=5.0
 
 RUN AGENT_VER=$(echo "$CASSANDRA_VERSION" | sed -r 's/^([0-9]+\.[0-9]+).*$/\1/') && \
     groupadd --gid 9988 axonops && \
@@ -190,7 +191,7 @@ RUN AGENT_VER=$(echo "$CASSANDRA_VERSION" | sed -r 's/^([0-9]+\.[0-9]+).*$/\1/')
     chmod 0400 /etc/axonops/axon-agent.yml && \
     touch /var/run/utmp
 
-ENV JVM_EXTRA_OPTS="-javaagent:/usr/share/axonops/axon-cassandra%MAJOR_VERSION%-agent.jar=/etc/axonops/axon-agent.yml"
+ENV JVM_EXTRA_OPTS="-javaagent:/usr/share/axonops/axon-cassandra${MAJOR_VERSION}-agent.jar=/etc/axonops/axon-agent.yml"
 
 COPY axonops-entrypoint.sh /axonops-entrypoint.sh
 RUN chown root:root /axonops-entrypoint.sh && chmod 0755 /axonops-entrypoint.sh

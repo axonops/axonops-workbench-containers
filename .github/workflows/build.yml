@@ -61,7 +61,7 @@ jobs:
 
           sed -i "s|%BASE_IMAGE%|ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ github.sha }}|g" cassandra/5.0/Dockerfile
           MAJOR_VERSION="${VERSION%.*}"
-          sed -i "s/{{MAJOR_VERSION}}/$VER/g" cassandra/5.0/Dockerfile
+          echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_ENV
 
       - name: Build the official cassandra base image 5.0
         uses: docker/build-push-action@v4
@@ -70,11 +70,12 @@ jobs:
           build-args: |
             VERSION=${{ env.CASS5_VERSION }}
             GitCommit=${{ github.sha }}
+            MAJOR_VERSION=${{ env.MAJOR_VERSION }}
           context: cassandra/5.0
-          push: false
+          push: true
           file: cassandra/5.0/Dockerfile
           tags: |
             ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ github.sha }}
-            ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ env.CASS5_VERSION }}
+            ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ github.env.CASS5_VERSION }}
           labels: |
             LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
