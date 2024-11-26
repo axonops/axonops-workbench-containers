@@ -29,9 +29,9 @@ jobs:
           versions50=$(curl -s $archive_url | grep -E '5\.0\.[0-9]+/' | awk '{print $5}'|cut -d \> -f2 | sed 's$/</a$$g' | sort)
 
           # Print the sorted versions
-          echo "versions40=$versions40" | jq -R -s 'split("\n")[:-1]' >> $GITHUB_OUTPUT
-          echo "versions41=$versions41" | jq -R -s 'split("\n")[:-1]' >> $GITHUB_OUTPUT
-          echo "versions50=$versions50" | jq -R -s 'split("\n")[:-1]' >> $GITHUB_OUTPUT
+          echo "versions40=$(echo "$versions40" | jq -R -s 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+          echo "versions41=$(echo "$versions41" | jq -R -s 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+          echo "versions50=$(echo "$versions50" | jq -R -s 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
 
 
   build:
