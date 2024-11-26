@@ -87,7 +87,8 @@ jobs:
           sha=$(curl -L https://archive.apache.org/dist/cassandra/${{ matrix.version }}/apache-cassandra-${{ matrix.version }}-bin.tar.gz.sha512)
           echo "CASSANDRA_SHA512=$sha" >> $GITHUB_ENV
 
-          MAJOR_VERSION="${VERSION%.*}"
+          CASSANDRA_VERSION=${{ matrix.version }}
+          MAJOR_VERSION="${CASSANDRA_VERSION%.*}"
           echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_ENV
 
           echo "CASSANDRA_VERSION=${{ matrix.version }}" >> $GITHUB_ENV
@@ -99,8 +100,9 @@ jobs:
 
           echo "context=cassandra/$MAJOR_VERSION" >> $GITHUB_OUTPUT
           echo "CASSANDRA_VERSION=$CASSANDRA_VERSION" >> $GITHUB_OUTPUT
+          echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Build the official cassandra base 
+      - name: Build the Apache Cassandra image
         uses: docker/build-push-action@v4
         id: build
         with:
