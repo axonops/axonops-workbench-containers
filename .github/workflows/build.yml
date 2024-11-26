@@ -72,6 +72,7 @@ jobs:
 
       - name: Build the official cassandra base image 5.0
         uses: docker/build-push-action@v4
+        id: build5
         with:
           platforms: linux/amd64,linux/arm64
           build-args: |
@@ -86,3 +87,12 @@ jobs:
             ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.versions.outputs.CASS5_VERSION }}
           labels: |
             LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
+
+      - name: Generate manitest
+        id: versions
+        run: |
+          sudo apt-get update && sudo apt-get -y install jq
+
+          jq -n \
+            --argjson ${{ env.CASS5_VERSION }} "$(jq -n --arg digest '${{ steps.build5.outputs.digest }}' --arg image '${{ steps.build5.outputs.imageid }}' --arg sha '${{ github.sha }}' $ARGS.named')" \
+            '$ARGS.named' > manifest.json
