@@ -1,3 +1,4 @@
+---
 name: Build Containers
 
 on:
@@ -67,8 +68,8 @@ jobs:
           MAJOR_VERSION="${VERSION%.*}"
           echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_ENV
 
-          sed -i "s/ENV CASSANDRA_VERSION.*/ENV CASSANDRA_VERSION $CASS5_VERSION/g" cassandra/5.0/Dockerfile 
-          sed -i "s/ENV CASSANDRA_SHA512.*/ENV CASSANDRA_SHA512 $CASS5_SHA/g" cassandra/5.0/Dockerfile 
+          sed -i "s/ENV CASSANDRA_VERSION.*/ENV CASSANDRA_VERSION $CASS5_VERSION/g" cassandra/5.0/Dockerfile
+          sed -i "s/ENV CASSANDRA_SHA512.*/ENV CASSANDRA_SHA512 $CASS5_SHA/g" cassandra/5.0/Dockerfile
 
       - name: Build the official cassandra base image 5.0
         uses: docker/build-push-action@v4
@@ -93,8 +94,5 @@ jobs:
           set -x
 
           jq -n \
-            --argjson cass5_version "${{ env.CASS5_VERSION }}" \
-            --arg digest "${{ steps.build5.outputs.digest }}" \
-            --arg image "${{ steps.build5.outputs.imageid }}" \
-            --arg sha "${{ github.sha }}" \
+            --argjson "${{ env.CASS5_VERSION }}" "$(jq -n --arg digest '${{ steps.build5.outputs.digest }}' --arg image '${{ steps.build5.outputs.imageid }}' --arg sha '${{ github.sha }}' $ARGS.named')" \
             '$ARGS.named' > manifest.json
