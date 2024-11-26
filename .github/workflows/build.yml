@@ -31,7 +31,6 @@ jobs:
           #all_versions=$(jq -c -n --argjson "5.0" $versions50 --argjson "4.0" $versions40 --argjson "4.1" $versions41 '$ARGS.named')
 
           delimiter="$(openssl rand -hex 8)"
-          JSON="$(cat ./deployment-config.json)"
           echo "versions50<<${delimiter}" >> "${GITHUB_OUTPUT}"
           echo "$versions50" >> "${GITHUB_OUTPUT}"
           echo "${delimiter}" >> "${GITHUB_OUTPUT}"
