@@ -39,20 +39,24 @@ jobs:
           password: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Get Cassandra versions
+        id: versions
         run: |
           cass5=$(curl -sL https://raw.githubusercontent.com/docker-library/cassandra/refs/heads/master/5.0/Dockerfile | grep "ENV CASSANDRA_VERSION" | awk '{print $3}')
           cass5_sha=$(curl -sL https://raw.githubusercontent.com/docker-library/cassandra/refs/heads/master/5.0/Dockerfile | grep "ENV CASSANDRA_SHA512" | awk '{print $3}')
           echo "CASS5_VERSION=${cass5}" >> $GITHUB_ENV
+          echo "CASS5_VERSION=${cass5}" >> $GITHUB_OUTPUT
           echo "CASS5_SHA=${cass5_sha}" >> $GITHUB_ENV
 
           cass4=$(curl -sL https://raw.githubusercontent.com/docker-library/cassandra/refs/heads/master/4.0/Dockerfile | grep "ENV CASSANDRA_VERSION" | awk '{print $3}')
           cass4_sha=$(curl -sL https://raw.githubusercontent.com/docker-library/cassandra/refs/heads/master/4.0/Dockerfile | grep "ENV CASSANDRA_SHA512" | awk '{print $3}')
           echo "CASS4_VERSION=${cass4}" >> $GITHUB_ENV
+          echo "CASS4_VERSION=${cass5}" >> $GITHUB_OUTPUT
           echo "CASS4_SHA=${cass4_sha}" >> $GITHUB_ENV
 
           cass41=$(curl -sL https://raw.githubusercontent.com/docker-library/cassandra/refs/heads/master/4.1/Dockerfile | grep "ENV CASSANDRA_VERSION" | awk '{print $3}')
           cass41_sha=$(curl -sL https://raw.githubusercontent.com/docker-library/cassandra/refs/heads/master/4.1/Dockerfile | grep "ENV CASSANDRA_SHA512" | awk '{print $3}')
           echo "CASS41_VERSION=${cass41}" >> $GITHUB_ENV
+          echo "CASS41_VERSION=${cass5}" >> $GITHUB_OUTPUT
           echo "CASS41_SHA=${cass41_sha}" >> $GITHUB_ENV
 
       - name: Prepare 5.0 AxonOps Workbench Dockerfile
@@ -62,6 +66,9 @@ jobs:
           sed -i "s|%BASE_IMAGE%|ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ github.sha }}|g" cassandra/5.0/Dockerfile
           MAJOR_VERSION="${VERSION%.*}"
           echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_ENV
+
+          sed -i cassandra/5.0/Dockerfile "s/ENV CASSANDRA_VERSION.*/ENV CASSANDRA_VERSION $CASS5_VERSION/g"
+          sed -i cassandra/5.0/Dockerfile "s/ENV CASSANDRA_SHA512.*/ENV CASSANDRA_SHA512 $CASS5_SHA/g"
 
       - name: Build the official cassandra base image 5.0
         uses: docker/build-push-action@v4
@@ -76,6 +83,6 @@ jobs:
           file: cassandra/5.0/Dockerfile
           tags: |
             ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ github.sha }}
-            ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ github.env.CASS5_VERSION }}
+            ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.vars.outputs.CASS5_VERSION }}
           labels: |
             LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
