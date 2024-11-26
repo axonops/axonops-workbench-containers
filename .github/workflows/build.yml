@@ -23,9 +23,16 @@ jobs:
           archive_url="https://archive.apache.org/dist/cassandra/"
           url="https://downloads.apache.org/cassandra/"
 
+          # Use curl to fetch the HTML content and grep to filter 4.x versions
+          versions40=$(curl -s $archive_url | grep -E '4\.0\.[0-9]+/' | awk '{print $5}'|cut -d \> -f2 | sed 's$/</a$$g' | sort)
+          versions41=$(curl -s $archive_url | grep -E '4\.1\.[0-9]+/' | awk '{print $5}'|cut -d \> -f2 | sed 's$/</a$$g' | sort)
           versions50=$(curl -s $archive_url | grep -E '5\.0\.[0-9]+/' | awk '{print $5}'|cut -d \> -f2 | sed 's$/</a$$g' | sort)
 
-          echo "$versions50" | jq -R -s 'split("\n")[:-1]' >> $GITHUB_OUTPUT
+          # Print the sorted versions
+          echo "versions40=$versions40" | jq -R -s 'split("\n")[:-1]' >> $GITHUB_OUTPUT
+          echo "versions41=$versions41" | jq -R -s 'split("\n")[:-1]' >> $GITHUB_OUTPUT
+          echo "versions50=$versions50" | jq -R -s 'split("\n")[:-1]' >> $GITHUB_OUTPUT
+
 
   build:
     name: Build containers
@@ -33,14 +40,14 @@ jobs:
     needs: [prepare]
     strategy:
       matrix:
-        value: ${{fromJSON(needs.prepare.outputs.cassandra50_versions)}}
+        version: ${{fromJSON(needs.prepare.outputs.versions50)}}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Debug
         run: |
-          echo "Building Apache Cassandra ${{ matrix.value }}"
+          echo "Building Apache Cassandra ${{ matrix.version }}"
 
       - name: Exit
         run: exit 1
