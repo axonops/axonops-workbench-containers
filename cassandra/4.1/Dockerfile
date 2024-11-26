@@ -90,8 +90,8 @@ ENV GPG_KEYS \
 # Berenguer Blasi (Code Signing Key) <bereng@apache.org>
 	CEC5C50B9C629EF0F5AB2706650B72EB14CCD622
 
-ENV CASSANDRA_VERSION 5.0.2
-ENV CASSANDRA_SHA512 51478b18b8bce82a6b4915f31470d031306724041a4f2b684fd17635f8a5a9802594c0bbc3d0154cfa52d87a253d7868636985787aa1e3e00136259302689363
+ENV CASSANDRA_VERSION 4.1.7
+ENV CASSANDRA_SHA512 5c5aeaf5d9ee4aab2a901188cd66a6056e4f06c61a6a7c6645f5994484abf8942f7be9a51f638827649f918980ef510760a5a900fd8bdfe3b72c3e40bac1d3cb
 
 RUN set -eux; \
 	savedAptMark="$(apt-mark showmanual)"; \
@@ -163,15 +163,7 @@ RUN set -eux; \
 	cassandra -v
 
 VOLUME /var/lib/cassandra
-
 COPY docker-entrypoint.sh /usr/local/bin/
-
-# 7000: intra-node communication
-# 7001: TLS intra-node communication
-# 7199: JMX
-# 9042: CQL
-# 9160: thrift service
-EXPOSE 7000 7001 7199 9042 9160
 
 ENV AXON_AGENT_LOG_OUTPUT=std
 
@@ -195,6 +187,10 @@ ENV JVM_EXTRA_OPTS="-javaagent:/usr/share/axonops/axon-cassandra%MAJOR_VERSION%-
 COPY axonops-entrypoint.sh /axonops-entrypoint.sh
 RUN chown root:root /axonops-entrypoint.sh && chmod 0755 /axonops-entrypoint.sh
 
-ENTRYPOINT ["/axonops-entrypoint.sh"]
-
+# 7000: intra-node communication
+# 7001: TLS intra-node communication
+# 7199: JMX
+# 9042: CQL
+# 9160: thrift service
+EXPOSE 7000 7001 7199 9042 9160
 CMD ["cassandra", "-f"]
