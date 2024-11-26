@@ -51,7 +51,7 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm64
           build-args: |
-            VERSION=${{ CASS5_VERSION }}
+            VERSION=${{ env.CASS5_VERSION }}
             GitCommit=${{ github.sha }}
           context: .
           push: true
