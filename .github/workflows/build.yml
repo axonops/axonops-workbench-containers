@@ -16,6 +16,8 @@ jobs:
   prepare:
     name: Get Cassandra versions
     runs-on: ubuntu-latest
+    outputs:
+      versions50: ${{ steps.cassandra_versions.outputs.versions50 }}
     steps:
       - name: Get versions
         id: cassandra_versions
@@ -34,6 +36,8 @@ jobs:
           echo "versions50<<${delimiter}" >> "${GITHUB_OUTPUT}"
           echo "$versions50" >> "${GITHUB_OUTPUT}"
           echo "${delimiter}" >> "${GITHUB_OUTPUT}"
+
+          echo "Done "
           
       - run: echo '${{ steps.cassandra_versions.outputs.versions50 }}' | jq -r .
 
