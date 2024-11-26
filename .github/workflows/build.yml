@@ -92,7 +92,21 @@ jobs:
       - name: Generate manitest
         run: |
           set -x
+          REPO=ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.versions.outputs.CASS5_VERSION }}
 
           jq -n \
-            --argjson "${{ env.CASS5_VERSION }}" "$(jq -n --arg digest '${{ steps.build5.outputs.digest }}' --arg image '${{ steps.build5.outputs.imageid }}' --arg sha '${{ github.sha }}' $ARGS.named')" \
+            --argjson "${{ env.CASS5_VERSION }}" "$(jq -n --arg digest '${{ steps.build5.outputs.digest }}' --arg image '${{ steps.build5.outputs.imageid }}' --arg repo "$REPO" '$ARGS.named')" \
             '$ARGS.named' > manifest.json
+
+      - name: Commit manifest.json
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add manifest.json
+          git commit -m "Add manifest"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
