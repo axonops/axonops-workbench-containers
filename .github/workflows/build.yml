@@ -84,8 +84,9 @@ jobs:
       - name: Prepare AxonOps Workbench Dockerfile
         id: setup
         run: |
-          sha=$(curl -L https://archive.apache.org/dist/cassandra/${{ matrix.version }}/apache-cassandra-${{ matrix.version }}-bin.tar.gz.sha512)
-          echo "CASSANDRA_SHA512=$sha" >> $GITHUB_ENV
+          set -x
+          CASSANDRA_SHA512=$(curl -L https://archive.apache.org/dist/cassandra/${{ matrix.version }}/apache-cassandra-${{ matrix.version }}-bin.tar.gz.sha512)
+          echo "CASSANDRA_SHA512=$CASSANDRA_SHA512" >> $GITHUB_ENV
 
           CASSANDRA_VERSION=${{ matrix.version }}
           MAJOR_VERSION="${CASSANDRA_VERSION%.*}"
