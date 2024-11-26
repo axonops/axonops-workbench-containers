@@ -1,7 +1,12 @@
 {
   "5.0.2": {
-    "digest": "sha256:e85a6a8b7d68374de8e11e44d4e6076bc084dcbd9d34474e1865651d3cb8f86d",
-    "image": "sha256:e85a6a8b7d68374de8e11e44d4e6076bc084dcbd9d34474e1865651d3cb8f86d",
+    "digest": "sha256:970e323fef35a7dd74f3d402820fb2b4d6f731f9cdff21f83c02c474ad311b1c",
+    "tag": "5.0.2",
+    "repo": "ghcr.io/axonops/cassandra:5.0.2"
+  },
+  "4.1.7": {
+    "digest": "sha256:0c42d4ff1f46e8f36432fe4f56ac2e34f4c797ca1e39018ffb511dbdc277e9ac",
+    "tag": "5.0.2",
     "repo": "ghcr.io/axonops/cassandra:5.0.2"
   }
 }
