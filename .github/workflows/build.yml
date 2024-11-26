@@ -54,7 +54,7 @@ jobs:
           build-args: |
             VERSION=${{ env.CASS5_VERSION }}
             GitCommit=${{ github.sha }}
-          context: .
+          context: cassandra/5.0
           push: true
           file: cassandra/5.0/Dockerfile
           tags: |
