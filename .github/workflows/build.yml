@@ -28,6 +28,7 @@ jobs:
       - name: "Get docker info"
         run: |
           echo "Actor: ${{ github.actor }}"
+          echo "REPO_OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       - name: "Log into GitHub Container Registry"
         if: "github.event_name != 'pull_request'"
