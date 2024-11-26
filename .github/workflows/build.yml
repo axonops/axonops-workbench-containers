@@ -57,7 +57,7 @@ jobs:
           push: true
           file: cassandra/5.0/Dockerfile
           tags: |
-            ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ VERSION }}
+            ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ env.CASS5_VERSION }}
           labels: |
             LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
 
@@ -65,7 +65,7 @@ jobs:
         run: |
           cp Dockerfile-template Dockerfile
 
-          sed -i "s|%BASE_IMAGE%|ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ VERSION }}|g" Dockerfile
+          sed -i "s|%BASE_IMAGE%|ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ env.CASS5_VERSION }}|g" Dockerfile
           MAJOR_VERSION="${VERSION%.*}"
           sed -i "s/{{MAJOR_VERSION}}/$VER/g" Dockerfile
       
