@@ -83,6 +83,6 @@ jobs:
           file: cassandra/5.0/Dockerfile
           tags: |
             ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ github.sha }}
-            ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ teps.versions.outputs.CASS5_VERSION }}
+            ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.versions.outputs.CASS5_VERSION }}
           labels: |
             LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
