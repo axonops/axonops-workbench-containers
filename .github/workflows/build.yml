@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Get versions
-        id: cassandra50_versions
+        id: cassandra_versions
         run: |
           archive_url="https://archive.apache.org/dist/cassandra/"
           url="https://downloads.apache.org/cassandra/"
@@ -32,7 +32,7 @@ jobs:
           echo "versions40=$(echo "$versions40" | jq -R -c -s 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
           echo "versions41=$(echo "$versions41" | jq -R -c -s 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
           echo "versions50=$(echo "$versions50" | jq -R -c -s 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
-
+      - run: echo "${{ steps.cassandra_versions.outputs.versions50 }}"
 
   build:
     name: Build containers
