@@ -67,8 +67,8 @@ jobs:
           MAJOR_VERSION="${VERSION%.*}"
           echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_ENV
 
-          sed -i cassandra/5.0/Dockerfile "s/ENV CASSANDRA_VERSION.*/ENV CASSANDRA_VERSION $CASS5_VERSION/g"
-          sed -i cassandra/5.0/Dockerfile "s/ENV CASSANDRA_SHA512.*/ENV CASSANDRA_SHA512 $CASS5_SHA/g"
+          sed -i "s/ENV CASSANDRA_VERSION.*/ENV CASSANDRA_VERSION $CASS5_VERSION/g" cassandra/5.0/Dockerfile 
+          sed -i "s/ENV CASSANDRA_SHA512.*/ENV CASSANDRA_SHA512 $CASS5_SHA/g" cassandra/5.0/Dockerfile 
 
       - name: Build the official cassandra base image 5.0
         uses: docker/build-push-action@v4
