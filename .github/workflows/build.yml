@@ -51,13 +51,13 @@ jobs:
           cass4=$(curl -sL https://raw.githubusercontent.com/docker-library/cassandra/refs/heads/master/4.0/Dockerfile | grep "ENV CASSANDRA_VERSION" | awk '{print $3}')
           cass4_sha=$(curl -sL https://raw.githubusercontent.com/docker-library/cassandra/refs/heads/master/4.0/Dockerfile | grep "ENV CASSANDRA_SHA512" | awk '{print $3}')
           echo "CASS4_VERSION=${cass4}" >> $GITHUB_ENV
-          echo "CASS4_VERSION=${cass5}" >> $GITHUB_OUTPUT
+          echo "CASS4_VERSION=${cass4}" >> $GITHUB_OUTPUT
           echo "CASS4_SHA=${cass4_sha}" >> $GITHUB_ENV
 
           cass41=$(curl -sL https://raw.githubusercontent.com/docker-library/cassandra/refs/heads/master/4.1/Dockerfile | grep "ENV CASSANDRA_VERSION" | awk '{print $3}')
           cass41_sha=$(curl -sL https://raw.githubusercontent.com/docker-library/cassandra/refs/heads/master/4.1/Dockerfile | grep "ENV CASSANDRA_SHA512" | awk '{print $3}')
           echo "CASS41_VERSION=${cass41}" >> $GITHUB_ENV
-          echo "CASS41_VERSION=${cass5}" >> $GITHUB_OUTPUT
+          echo "CASS41_VERSION=${cass41}" >> $GITHUB_OUTPUT
           echo "CASS41_SHA=${cass41_sha}" >> $GITHUB_ENV
 
       - name: Prepare 5.0 AxonOps Workbench Dockerfile
@@ -116,14 +116,45 @@ jobs:
           labels: |
             LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
 
+      - name: Prepare 4.0 AxonOps Workbench Dockerfile
+        run: |
+          cp axonops-entrypoint.sh cassandra/4.0
+
+          sed -i "s|%BASE_IMAGE%|ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ github.sha }}|g" cassandra/4.0/Dockerfile
+          MAJOR_VERSION="${VERSION%.*}"
+          echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_ENV
+
+          sed -i "s/ENV CASSANDRA_VERSION.*/ENV CASSANDRA_VERSION $CASS4_VERSION/g" cassandra/4.0/Dockerfile
+          sed -i "s/ENV CASSANDRA_SHA512.*/ENV CASSANDRA_SHA512 $CASS4_SHA/g" cassandra/4.0/Dockerfile
+
+      - name: Build the official cassandra base image 4.0
+        uses: docker/build-push-action@v4
+        id: build4
+        with:
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            VERSION=${{ env.CASS4_VERSION }}
+            GitCommit=${{ github.sha }}
+            MAJOR_VERSION=${{ env.MAJOR_VERSION }}
+          context: cassandra/4.0
+          push: true
+          file: cassandra/4.0/Dockerfile
+          tags: |
+            ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.versions.outputs.CASS4_VERSION }}
+          labels: |
+            LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
+
       - name: Generate manitest
         run: |
           set -x
-          REPO=ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.versions.outputs.CASS5_VERSION }}
+          REPO5=ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.versions.outputs.CASS5_VERSION }}
+          REPO41=ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ env.CASS41_VERSION }}
+          REPO4=ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ env.CASS4_VERSION }}
 
           jq -n \
-            --argjson "${{ env.CASS5_VERSION }}" "$(jq -n --arg digest '${{ steps.build5.outputs.digest }}' --arg tag '${{ steps.versions.outputs.CASS5_VERSION }}' --arg repo "$REPO" '$ARGS.named')" \
-            --argjson "${{ env.CASS41_VERSION }}" "$(jq -n --arg digest '${{ steps.build41.outputs.digest }}' --arg tag '${{ steps.versions.outputs.CASS41_VERSION }}' --arg repo "$REPO" '$ARGS.named')" \
+            --argjson "${{ env.CASS5_VERSION }}" "$(jq -n --arg digest '${{ steps.build5.outputs.digest }}' --arg tag '${{ steps.versions.outputs.CASS5_VERSION }}' --arg repo "$REPO5" '$ARGS.named')" \
+            --argjson "${{ env.CASS41_VERSION }}" "$(jq -n --arg digest '${{ steps.build41.outputs.digest }}' --arg tag '${{ env.CASS41_VERSION }}' --arg repo "$REPO41" '$ARGS.named')" \
+            --argjson "${{ env.CASS4_VERSION }}" "$(jq -n --arg digest '${{ steps.build4.outputs.digest }}' --arg tag '${{ env.CASS4_VERSION }}' --arg repo "$REPO4" '$ARGS.named')" \
             '$ARGS.named' > manifest.json
 
       - name: Commit manifest.json
