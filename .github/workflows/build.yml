@@ -13,12 +13,37 @@ defaults:
     shell: bash
 
 jobs:
-  release:
+  prepare:
+    name: Get Cassandra versions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get versions
+        id: cassandra50_versions
+        run: |
+          archive_url="https://archive.apache.org/dist/cassandra/"
+          url="https://downloads.apache.org/cassandra/"
+
+          versions50=$(curl -s $archive_url | grep -E '5\.0\.[0-9]+/' | awk '{print $5}'|cut -d \> -f2 | sed 's$/</a$$g' | sort)
+
+          echo "$versions50" | jq -R -s 'split("\n")[:-1]' >> $GITHUB_OUTPUT
+
+  build:
     name: Build containers
     runs-on: ubuntu-latest
+    needs: [prepare]
+    strategy:
+      matrix:
+        value: ${{fromJSON(needs.prepare.outputs.cassandra50_versions)}}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Debug
+        run: |
+          echo "Building Apache Cassandra ${{ cassandra50_versions.value }}"
+
+      - name: Exit
+        run: exit 1
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
