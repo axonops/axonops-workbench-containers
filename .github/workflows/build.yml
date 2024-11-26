@@ -47,6 +47,14 @@ jobs:
           cass41=$(curl -sL https://raw.githubusercontent.com/docker-library/cassandra/refs/heads/master/4.1/Dockerfile | grep "ENV CASSANDRA_VERSION" | awk '{print $3}')
           echo "CASS41_VERSION=${cass41}" >> $GITHUB_ENV
 
+      - name: Prepare 5.0 AxonOps Workbench Dockerfile
+        run: |
+          cp axonops-entrypoint.sh cassandra/5.0
+
+          sed -i "s|%BASE_IMAGE%|ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ github.sha }}|g" cassandra/5.0/Dockerfile
+          MAJOR_VERSION="${VERSION%.*}"
+          sed -i "s/{{MAJOR_VERSION}}/$VER/g" cassandra/5.0/Dockerfile
+
       - name: Build the official cassandra base image 5.0
         uses: docker/build-push-action@v4
         with:
@@ -59,28 +67,5 @@ jobs:
           file: cassandra/5.0/Dockerfile
           tags: |
             ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ github.sha }}
-          labels: |
-            LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
-
-      - name: Prepare 5.0 AxonOps Workbench Dockerfile
-        run: |
-          cp Dockerfile-template Dockerfile
-
-          sed -i "s|%BASE_IMAGE%|ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ github.sha }}|g" Dockerfile
-          MAJOR_VERSION="${VERSION%.*}"
-          sed -i "s/{{MAJOR_VERSION}}/$VER/g" Dockerfile
-      
-      - name: Build the AxonOps Workbench image 5.0
-        uses: docker/build-push-action@v4
-        with:
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            VERSION=${{ env.CASS5_VERSION }}
-            GitCommit=${{ github.sha }}
-          context: .
-          push: true
-          file: Dockerfile
-          tags: |
-            ghcr.io/${{ env.REPO_OWNER }}/wb-cassandra:${{ github.sha }}
           labels: |
             LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
