@@ -95,8 +95,8 @@ jobs:
 
           cp axonops-entrypoint.sh cassandra/${{ matrix.version }}
 
-          sed -i "s/ENV CASSANDRA_VERSION.*/ENV CASSANDRA_VERSION ${{ matrix.version }}/g" cassandra/${{ matrix.version }}/Dockerfile
-          sed -i "s/ENV CASSANDRA_SHA512.*/ENV CASSANDRA_SHA512 $CASSANDRA_SHA512/g" cassandra/${{ matrix.version }}/Dockerfile
+          sed -i "s/ENV CASSANDRA_VERSION.*/ENV CASSANDRA_VERSION ${{ matrix.version }}/g" cassandra/${MAJOR_VERSION}/Dockerfile
+          sed -i "s/ENV CASSANDRA_SHA512.*/ENV CASSANDRA_SHA512 $CASSANDRA_SHA512/g" cassandra/${MAJOR_VERSION}/Dockerfile
 
           echo "context=cassandra/$MAJOR_VERSION" >> $GITHUB_OUTPUT
           echo "CASSANDRA_VERSION=$CASSANDRA_VERSION" >> $GITHUB_OUTPUT
