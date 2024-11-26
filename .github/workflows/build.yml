@@ -32,7 +32,7 @@ jobs:
           echo "versions40=$(echo "$versions40" | jq -R -c -s 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
           echo "versions41=$(echo "$versions41" | jq -R -c -s 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
           echo "versions50=$(echo "$versions50" | jq -R -c -s 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
-      - run: echo "${{ steps.cassandra_versions.outputs.versions50 }}"
+      - run: echo "${{ steps.cassandra_versions.outputs.versions50 }}" | jq -r .
 
   build:
     name: Build containers
@@ -40,7 +40,7 @@ jobs:
     needs: [prepare]
     strategy:
       matrix:
-        version: ${{fromJSON(needs.prepare.outputs.versions50)}}
+        version: ${{ fromJSON(needs.prepare.outputs.versions50) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
