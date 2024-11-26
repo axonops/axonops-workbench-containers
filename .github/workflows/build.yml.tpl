@@ -107,22 +107,46 @@ jobs:
           echo "CASSANDRA_VERSION=$CASSANDRA_VERSION" >> $GITHUB_OUTPUT
           echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Build the Apache Cassandra image
-        uses: docker/build-push-action@v4
-        id: build
+      # - name: Build the Apache Cassandra image
+      #   uses: docker/build-push-action@v4
+      #   id: build
+      #   with:
+      #     platforms: linux/amd64,linux/arm64
+      #     build-args: |
+      #       VERSION=${{ matrix.version }}
+      #       GitCommit=${{ github.sha }}
+      #       MAJOR_VERSION=${{ env.MAJOR_VERSION }}
+      #     context: ${{ steps.setup.outputs.context }}
+      #     push: true
+      #     file: ${{ steps.setup.outputs.context }}/Dockerfile
+      #     tags: |
+      #       ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.setup.outputs.CASSANDRA_VERSION }}
+      #     labels: |
+      #       LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
+
+      - name: Generate manitest
+        run: |
+          set -x
+
+          mkdir -p manifests/cassandra/docker
+
+          REPO=ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ matrix.version }}
+
+          jq -n \
+            --argjson "${{ env.MAJOR_VERSION }}" "$(jq -n --arg digest '${{ steps.build.outputs.digest }}' --arg tag '${{ steps.setup.outputs.CASSANDRA_VERSION }}' --arg repo "$REPO" '$ARGS.named')" \
+            '$ARGS.named' > manifests/cassandra/docker/${{ matrix.version }}.json
+      - name: Commit manifest
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add manifests
+          git commit -m "Add manifest"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
         with:
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            VERSION=${{ matrix.version }}
-            GitCommit=${{ github.sha }}
-            MAJOR_VERSION=${{ env.MAJOR_VERSION }}
-          context: ${{ steps.setup.outputs.context }}
-          push: true
-          file: ${{ steps.setup.outputs.context }}/Dockerfile
-          tags: |
-            ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.setup.outputs.CASSANDRA_VERSION }}
-          labels: |
-            LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
 
   build41:
     name: Build containers for Cassandra 4.0
