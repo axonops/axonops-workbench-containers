@@ -85,7 +85,7 @@ jobs:
         id: setup
         run: |
           set -x
-          CASSANDRA_SHA512=$(curl -L https://archive.apache.org/dist/cassandra/${{ matrix.version }}/apache-cassandra-${{ matrix.version }}-bin.tar.gz.sha512)
+          CASSANDRA_SHA512=$(curl -L --connect-timeout 2 --retry 5 --retry-delay 1 https://archive.apache.org/dist/cassandra/${{ matrix.version }}/apache-cassandra-${{ matrix.version }}-bin.tar.gz.sha512)
           echo "CASSANDRA_SHA512=$CASSANDRA_SHA512" >> $GITHUB_ENV
 
           CASSANDRA_VERSION=${{ matrix.version }}
@@ -119,62 +119,6 @@ jobs:
             ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.setup.outputs.CASSANDRA_VERSION }}
           labels: |
             LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
-
-      # - name: Prepare 4.1 AxonOps Workbench Dockerfile
-      #   run: |
-      #     cp axonops-entrypoint.sh cassandra/4.1
-
-      #     sed -i "s|%BASE_IMAGE%|ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ github.sha }}|g" cassandra/4.1/Dockerfile
-      #     MAJOR_VERSION="${VERSION%.*}"
-      #     echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_ENV
-
-      #     sed -i "s/ENV CASSANDRA_VERSION.*/ENV CASSANDRA_VERSION $CASS41_VERSION/g" cassandra/4.1/Dockerfile
-      #     sed -i "s/ENV CASSANDRA_SHA512.*/ENV CASSANDRA_SHA512 $CASS41_SHA/g" cassandra/4.1/Dockerfile
-
-      # - name: Build the official cassandra base image 4.1
-      #   uses: docker/build-push-action@v4
-      #   id: build41
-      #   with:
-      #     platforms: linux/amd64,linux/arm64
-      #     build-args: |
-      #       VERSION=${{ env.CASS41_VERSION }}
-      #       GitCommit=${{ github.sha }}
-      #       MAJOR_VERSION=${{ env.MAJOR_VERSION }}
-      #     context: cassandra/4.1
-      #     push: true
-      #     file: cassandra/4.1/Dockerfile
-      #     tags: |
-      #       ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.versions.outputs.CASS41_VERSION }}
-      #     labels: |
-      #       LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
-
-      # - name: Prepare 4.0 AxonOps Workbench Dockerfile
-      #   run: |
-      #     cp axonops-entrypoint.sh cassandra/4.0
-
-      #     sed -i "s|%BASE_IMAGE%|ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ github.sha }}|g" cassandra/4.0/Dockerfile
-      #     MAJOR_VERSION="${VERSION%.*}"
-      #     echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_ENV
-
-      #     sed -i "s/ENV CASSANDRA_VERSION.*/ENV CASSANDRA_VERSION $CASS4_VERSION/g" cassandra/4.0/Dockerfile
-      #     sed -i "s/ENV CASSANDRA_SHA512.*/ENV CASSANDRA_SHA512 $CASS4_SHA/g" cassandra/4.0/Dockerfile
-
-      # - name: Build the official cassandra base image 4.0
-      #   uses: docker/build-push-action@v4
-      #   id: build4
-      #   with:
-      #     platforms: linux/amd64,linux/arm64
-      #     build-args: |
-      #       VERSION=${{ env.CASS4_VERSION }}
-      #       GitCommit=${{ github.sha }}
-      #       MAJOR_VERSION=${{ env.MAJOR_VERSION }}
-      #     context: cassandra/4.0
-      #     push: true
-      #     file: cassandra/4.0/Dockerfile
-      #     tags: |
-      #       ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.versions.outputs.CASS4_VERSION }}
-      #     labels: |
-      #       LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
 
       # - name: Generate manitest
       #   run: |
