@@ -107,22 +107,22 @@ jobs:
           echo "CASSANDRA_VERSION=$CASSANDRA_VERSION" >> $GITHUB_OUTPUT
           echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_OUTPUT
 
-      # - name: Build the Apache Cassandra image
-      #   uses: docker/build-push-action@v4
-      #   id: build
-      #   with:
-      #     platforms: linux/amd64,linux/arm64
-      #     build-args: |
-      #       VERSION=${{ matrix.version }}
-      #       GitCommit=${{ github.sha }}
-      #       MAJOR_VERSION=${{ env.MAJOR_VERSION }}
-      #     context: ${{ steps.setup.outputs.context }}
-      #     push: true
-      #     file: ${{ steps.setup.outputs.context }}/Dockerfile
-      #     tags: |
-      #       ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.setup.outputs.CASSANDRA_VERSION }}
-      #     labels: |
-      #       LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
+      - name: Build the Apache Cassandra image
+        uses: docker/build-push-action@v4
+        id: build
+        with:
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            VERSION=${{ matrix.version }}
+            GitCommit=${{ github.sha }}
+            MAJOR_VERSION=${{ env.MAJOR_VERSION }}
+          context: ${{ steps.setup.outputs.context }}
+          push: true
+          file: ${{ steps.setup.outputs.context }}/Dockerfile
+          tags: |
+            ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.setup.outputs.CASSANDRA_VERSION }}
+          labels: |
+            LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
 
       - name: Generate manitest
         run: |
