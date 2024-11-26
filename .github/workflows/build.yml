@@ -40,7 +40,7 @@ jobs:
 
       - name: Debug
         run: |
-          echo "Building Apache Cassandra ${{ cassandra50_versions.value }}"
+          echo "Building Apache Cassandra ${{ matrix.value }}"
 
       - name: Exit
         run: exit 1
