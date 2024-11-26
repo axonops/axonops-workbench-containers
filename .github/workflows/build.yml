@@ -79,7 +79,7 @@ jobs:
             GitCommit=${{ github.sha }}
           context: .
           push: true
-          file: cassandra/5.0/Dockerfile
+          file: Dockerfile
           tags: |
             ghcr.io/${{ env.REPO_OWNER }}/wb-cassandra:${{ github.sha }}
           labels: |
