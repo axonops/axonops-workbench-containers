@@ -145,6 +145,7 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
+          git pull
           git add manifests manifest.json
           git commit -m "Add manifest [skip ci]"
 
