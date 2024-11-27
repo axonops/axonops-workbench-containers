@@ -7,6 +7,7 @@ on:
       - initial
     # tags:
     #   - 'v*'
+  workflow_dispatch:
 
 defaults:
   run:
