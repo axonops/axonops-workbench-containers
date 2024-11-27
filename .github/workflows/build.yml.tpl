@@ -140,13 +140,13 @@ jobs:
             '$ARGS.named' > manifests/cassandra/docker/${{ matrix.version }}.json
           
           # merge into a single main one
-          jq -s 'reduce .[] as $item ({}; .cassandra.docker += $item)' manifests/cassandra/docker/*.json > manifest.json
+          #jq -s 'reduce .[] as $item ({}; .cassandra.docker += $item)' manifests/cassandra/docker/*.json > manifest.json
 
       - name: Commit manifest
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add manifests manifest.json
+          git add manifests
           git pull
           git commit -m "Add manifest for ${{ matrix.version }} [skip ci]"
 
@@ -174,21 +174,26 @@ jobs:
   #       version: ${{ fromJSON(needs.prepare.outputs.versions40) }}
   #   steps: *docker_steps
 
-  # commit:
-  #   name: Commit manifests
-  #   runs-on: ubuntu-latest
-  #   needs: [build40,build41,build50]
-  #   steps:
-  #     - name: Commit manifest
-  #       run: |
-  #         git config --local user.email "github-actions[bot]@users.noreply.github.com"
-  #         git config --local user.name "github-actions[bot]"
-  #         git pull
-  #         git add manifests manifest.json
-  #         git commit -m "Add manifest [skip ci]"
+  commit:
+    name: Commit manifests
+    runs-on: ubuntu-latest
+    needs: [build40,build41,build50]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-  #     - name: Push changes
-  #       uses: ad-m/github-push-action@master
-  #       with:
-  #         github_token: ${{ secrets.GITHUB_TOKEN }}
-  #         branch: ${{ github.ref }}
+      - name: Commit manifest
+        run: |
+          jq -s 'reduce .[] as $item ({}; .cassandra.docker += $item)' manifests/cassandra/docker/*.json > manifest.json
+
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git pull
+          git add manifests manifest.json
+          git commit -m "Add manifest [skip ci]"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
