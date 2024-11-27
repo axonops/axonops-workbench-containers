@@ -182,7 +182,7 @@ jobs:
     name: Commit manifests
     runs-on: ubuntu-latest
     #needs: [build40,build41,build50]
-    needs: [build50]
+    needs: [prepare,build50]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
