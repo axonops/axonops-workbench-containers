@@ -160,29 +160,28 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
 
-  # build41:
-  #   name: Build containers for Cassandra 4.0
-  #   runs-on: ubuntu-latest
-  #   needs: [prepare]
-  #   strategy:
-  #     matrix:
-  #       version: ${{ fromJSON(needs.prepare.outputs.versions41) }}
-  #   steps: *docker_steps
+  build41:
+    name: Build containers for Cassandra 4.0
+    runs-on: ubuntu-latest
+    needs: [prepare]
+    strategy:
+      matrix:
+        version: ${{ fromJSON(needs.prepare.outputs.versions41) }}
+    steps: *docker_steps
 
-  # build40:
-  #   name: Build containers for Cassandra 4.1
-  #   runs-on: ubuntu-latest
-  #   needs: [prepare]
-  #   strategy:
-  #     matrix:
-  #       version: ${{ fromJSON(needs.prepare.outputs.versions40) }}
-  #   steps: *docker_steps
+  build40:
+    name: Build containers for Cassandra 4.1
+    runs-on: ubuntu-latest
+    needs: [prepare]
+    strategy:
+      matrix:
+        version: ${{ fromJSON(needs.prepare.outputs.versions40) }}
+    steps: *docker_steps
 
   commit:
     name: Commit manifests
     runs-on: ubuntu-latest
-    #needs: [build40,build41,build50]
-    needs: [prepare,build50]
+    needs: [build40,build41,build50]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
