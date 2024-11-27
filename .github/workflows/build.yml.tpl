@@ -147,6 +147,10 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add manifests
+          if [ $(git status --porcelain | wc -l) -eq "0" ]; then
+            echo "No changes to commit"
+            exit 0
+          fi
           git pull
           git commit -m "Add manifest for ${{ matrix.version }} [skip ci]"
 
@@ -190,7 +194,12 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git pull
           git add manifests manifest.json
+          if [ $(git status --porcelain | wc -l) -eq "0" ]; then
+            echo "No changes to commit"
+            exit 0
+          fi
           git commit -m "Add manifest [skip ci]"
+
 
       - name: Push changes
         uses: ad-m/github-push-action@master
