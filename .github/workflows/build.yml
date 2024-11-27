@@ -145,28 +145,196 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
-  # build41:
-  #   name: Build containers for Cassandra 4.0
-  #   runs-on: ubuntu-latest
-  #   needs: [prepare]
-  #   strategy:
-  #     matrix:
-  #       version: ${{ fromJSON(needs.prepare.outputs.versions41) }}
-  #   steps: *docker_steps
+  build41:
+    name: Build containers for Cassandra 4.0
+    runs-on: ubuntu-latest
+    needs: [prepare]
+    strategy:
+      matrix:
+        version: ${{ fromJSON(needs.prepare.outputs.versions41) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: "Get docker info"
+        run: |
+          echo "Actor: ${{ github.actor }}"
+          echo "REPO_OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+      - name: "Log into GitHub Container Registry"
+        if: "github.event_name != 'pull_request'"
+        uses: "docker/login-action@v1"
+        with:
+          registry: "ghcr.io"
+          username: "${{ github.actor }}"
+          password: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Prepare AxonOps Workbench Dockerfile
+        id: setup
+        run: |
+          CASSANDRA_SHA512=$(curl -L --connect-timeout 2 --retry 5 --retry-delay 1 https://archive.apache.org/dist/cassandra/${{ matrix.version }}/apache-cassandra-${{ matrix.version }}-bin.tar.gz.sha512)
+          echo "CASSANDRA_SHA512=$CASSANDRA_SHA512" >> $GITHUB_ENV
 
-  # build40:
-  #   name: Build containers for Cassandra 4.1
-  #   runs-on: ubuntu-latest
-  #   needs: [prepare]
-  #   strategy:
-  #     matrix:
-  #       version: ${{ fromJSON(needs.prepare.outputs.versions40) }}
-  #   steps: *docker_steps
+          CASSANDRA_VERSION=${{ matrix.version }}
+          MAJOR_VERSION="${CASSANDRA_VERSION%.*}"
+          echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_ENV
+
+          echo "CASSANDRA_VERSION=${{ matrix.version }}" >> $GITHUB_ENV
+
+          cp axonops-entrypoint.sh cassandra/${MAJOR_VERSION}
+
+          sed -i "s/ENV CASSANDRA_VERSION.*/ENV CASSANDRA_VERSION ${{ matrix.version }}/g" cassandra/${MAJOR_VERSION}/Dockerfile
+          sed -i "s/ENV CASSANDRA_SHA512.*/ENV CASSANDRA_SHA512 $CASSANDRA_SHA512/g" cassandra/${MAJOR_VERSION}/Dockerfile
+
+          echo "context=cassandra/$MAJOR_VERSION" >> $GITHUB_OUTPUT
+          echo "CASSANDRA_VERSION=$CASSANDRA_VERSION" >> $GITHUB_OUTPUT
+          echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_OUTPUT
+      - name: Build the Apache Cassandra image
+        uses: docker/build-push-action@v4
+        id: build
+        with:
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            VERSION=${{ matrix.version }}
+            GitCommit=${{ github.sha }}
+            MAJOR_VERSION=${{ env.MAJOR_VERSION }}
+          context: ${{ steps.setup.outputs.context }}
+          push: true
+          pull: true
+          sbom: true
+          file: ${{ steps.setup.outputs.context }}/Dockerfile
+          tags: |
+            ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.setup.outputs.CASSANDRA_VERSION }}
+          labels: |
+            LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
+      - name: Generate manitest
+        run: |
+          set -x
+
+          mkdir -p manifests/cassandra/docker
+
+          REPO=ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ matrix.version }}
+
+          jq -n \
+            --argjson "${{ steps.setup.outputs.CASSANDRA_VERSION }}" "$(jq -n --arg digest '${{ steps.build.outputs.digest }}' --arg tag '${{ steps.setup.outputs.CASSANDRA_VERSION }}' --arg repo "$REPO" '$ARGS.named')" \
+            '$ARGS.named' > manifests/cassandra/docker/${{ matrix.version }}.json
+
+          # merge into a single main one
+          #jq -s 'reduce .[] as $item ({}; .cassandra.docker += $item)' manifests/cassandra/docker/*.json > manifest.json
+      - name: Commit manifest
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add manifests
+          if [ $(git status --porcelain | wc -l) -eq "0" ]; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git pull
+          git commit -m "Add manifest for ${{ matrix.version }} [skip ci]"
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+  build40:
+    name: Build containers for Cassandra 4.1
+    runs-on: ubuntu-latest
+    needs: [prepare]
+    strategy:
+      matrix:
+        version: ${{ fromJSON(needs.prepare.outputs.versions40) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: "Get docker info"
+        run: |
+          echo "Actor: ${{ github.actor }}"
+          echo "REPO_OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+      - name: "Log into GitHub Container Registry"
+        if: "github.event_name != 'pull_request'"
+        uses: "docker/login-action@v1"
+        with:
+          registry: "ghcr.io"
+          username: "${{ github.actor }}"
+          password: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Prepare AxonOps Workbench Dockerfile
+        id: setup
+        run: |
+          CASSANDRA_SHA512=$(curl -L --connect-timeout 2 --retry 5 --retry-delay 1 https://archive.apache.org/dist/cassandra/${{ matrix.version }}/apache-cassandra-${{ matrix.version }}-bin.tar.gz.sha512)
+          echo "CASSANDRA_SHA512=$CASSANDRA_SHA512" >> $GITHUB_ENV
+
+          CASSANDRA_VERSION=${{ matrix.version }}
+          MAJOR_VERSION="${CASSANDRA_VERSION%.*}"
+          echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_ENV
+
+          echo "CASSANDRA_VERSION=${{ matrix.version }}" >> $GITHUB_ENV
+
+          cp axonops-entrypoint.sh cassandra/${MAJOR_VERSION}
+
+          sed -i "s/ENV CASSANDRA_VERSION.*/ENV CASSANDRA_VERSION ${{ matrix.version }}/g" cassandra/${MAJOR_VERSION}/Dockerfile
+          sed -i "s/ENV CASSANDRA_SHA512.*/ENV CASSANDRA_SHA512 $CASSANDRA_SHA512/g" cassandra/${MAJOR_VERSION}/Dockerfile
+
+          echo "context=cassandra/$MAJOR_VERSION" >> $GITHUB_OUTPUT
+          echo "CASSANDRA_VERSION=$CASSANDRA_VERSION" >> $GITHUB_OUTPUT
+          echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_OUTPUT
+      - name: Build the Apache Cassandra image
+        uses: docker/build-push-action@v4
+        id: build
+        with:
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            VERSION=${{ matrix.version }}
+            GitCommit=${{ github.sha }}
+            MAJOR_VERSION=${{ env.MAJOR_VERSION }}
+          context: ${{ steps.setup.outputs.context }}
+          push: true
+          pull: true
+          sbom: true
+          file: ${{ steps.setup.outputs.context }}/Dockerfile
+          tags: |
+            ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.setup.outputs.CASSANDRA_VERSION }}
+          labels: |
+            LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
+      - name: Generate manitest
+        run: |
+          set -x
+
+          mkdir -p manifests/cassandra/docker
+
+          REPO=ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ matrix.version }}
+
+          jq -n \
+            --argjson "${{ steps.setup.outputs.CASSANDRA_VERSION }}" "$(jq -n --arg digest '${{ steps.build.outputs.digest }}' --arg tag '${{ steps.setup.outputs.CASSANDRA_VERSION }}' --arg repo "$REPO" '$ARGS.named')" \
+            '$ARGS.named' > manifests/cassandra/docker/${{ matrix.version }}.json
+
+          # merge into a single main one
+          #jq -s 'reduce .[] as $item ({}; .cassandra.docker += $item)' manifests/cassandra/docker/*.json > manifest.json
+      - name: Commit manifest
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add manifests
+          if [ $(git status --porcelain | wc -l) -eq "0" ]; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git pull
+          git commit -m "Add manifest for ${{ matrix.version }} [skip ci]"
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
   commit:
     name: Commit manifests
     runs-on: ubuntu-latest
-    #needs: [build40,build41,build50]
-    needs: [prepare, build50]
+    needs: [build40, build41, build50]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
