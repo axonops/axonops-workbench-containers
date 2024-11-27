@@ -118,6 +118,8 @@ jobs:
             MAJOR_VERSION=${{ env.MAJOR_VERSION }}
           context: ${{ steps.setup.outputs.context }}
           push: true
+          pull: true
+          sbom: true
           file: ${{ steps.setup.outputs.context }}/Dockerfile
           tags: |
             ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.setup.outputs.CASSANDRA_VERSION }}
@@ -133,14 +135,18 @@ jobs:
           REPO=ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ matrix.version }}
 
           jq -n \
-            --argjson "${{ env.MAJOR_VERSION }}" "$(jq -n --arg digest '${{ steps.build.outputs.digest }}' --arg tag '${{ steps.setup.outputs.CASSANDRA_VERSION }}' --arg repo "$REPO" '$ARGS.named')" \
+            --argjson "${{ steps.setup.outputs.CASSANDRA_VERSION }}" "$(jq -n --arg digest '${{ steps.build.outputs.digest }}' --arg tag '${{ steps.setup.outputs.CASSANDRA_VERSION }}' --arg repo "$REPO" '$ARGS.named')" \
             '$ARGS.named' > manifests/cassandra/docker/${{ matrix.version }}.json
+          
+          # merge into a single main one
+          jq -s 'reduce .[] as $item ({}; .cassandra.docker += $item)' manifests/cassandra/docker/*.json > manifest.json
+
       - name: Commit manifest
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add manifests
-          git commit -m "Add manifest"
+          git add manifests manifest.json
+          git commit -m "Add manifest [skip ci]"
 
       - name: Push changes
         uses: ad-m/github-push-action@master
@@ -165,29 +171,3 @@ jobs:
       matrix:
         version: ${{ fromJSON(needs.prepare.outputs.versions40) }}
     steps: *docker_steps
-
-      # - name: Generate manitest
-      #   run: |
-      #     set -x
-      #     REPO5=ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.versions.outputs.CASS5_VERSION }}
-      #     REPO41=ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ env.CASS41_VERSION }}
-      #     REPO4=ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ env.CASS4_VERSION }}
-
-      #     jq -n \
-      #       --argjson "${{ env.CASS5_VERSION }}" "$(jq -n --arg digest '${{ steps.build5.outputs.digest }}' --arg tag '${{ steps.versions.outputs.CASS5_VERSION }}' --arg repo "$REPO5" '$ARGS.named')" \
-      #       --argjson "${{ env.CASS41_VERSION }}" "$(jq -n --arg digest '${{ steps.build41.outputs.digest }}' --arg tag '${{ env.CASS41_VERSION }}' --arg repo "$REPO41" '$ARGS.named')" \
-      #       --argjson "${{ env.CASS4_VERSION }}" "$(jq -n --arg digest '${{ steps.build4.outputs.digest }}' --arg tag '${{ env.CASS4_VERSION }}' --arg repo "$REPO4" '$ARGS.named')" \
-      #       '$ARGS.named' > manifest.json
-
-      # - name: Commit manifest.json
-      #   run: |
-      #     git config --local user.email "github-actions[bot]@users.noreply.github.com"
-      #     git config --local user.name "github-actions[bot]"
-      #     git add manifest.json
-      #     git commit -m "Add manifest"
-
-      # - name: Push changes
-      #   uses: ad-m/github-push-action@master
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     branch: ${{ github.ref }}
