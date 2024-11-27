@@ -141,20 +141,6 @@ jobs:
           # merge into a single main one
           jq -s 'reduce .[] as $item ({}; .cassandra.docker += $item)' manifests/cassandra/docker/*.json > manifest.json
 
-      - name: Commit manifest
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git pull
-          git add manifests manifest.json
-          git commit -m "Add manifest [skip ci]"
-
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
-
   build41:
     name: Build containers for Cassandra 4.0
     runs-on: ubuntu-latest
@@ -172,3 +158,22 @@ jobs:
       matrix:
         version: ${{ fromJSON(needs.prepare.outputs.versions40) }}
     steps: *docker_steps
+
+  commit:
+    name: Commit manifests
+    runs-on: ubuntu-latest
+    needs: [build40,build41,build50]
+    steps:
+      - name: Commit manifest
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git pull
+          git add manifests manifest.json
+          git commit -m "Add manifest [skip ci]"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
