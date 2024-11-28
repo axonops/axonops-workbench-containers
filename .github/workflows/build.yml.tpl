@@ -146,6 +146,7 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
+          git config pull.ff only
           git pull
           git add manifests
           if [ $(git status --porcelain | wc -l) -eq "0" ]; then
@@ -156,10 +157,11 @@ jobs:
 
           retry_count=0
           while [ $retry_count -lt 4 ]; do
-            git push || {
-              sleep 5
-              git pull
-            }
+            if git push; then
+              break
+            fi
+            sleep 5
+            git pull
             retry_count=$((retry_count + 1))
           done
 
