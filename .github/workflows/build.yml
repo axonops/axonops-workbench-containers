@@ -133,7 +133,7 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git config pull.ff only
+          git config pull.rebase true
           git pull
           git add manifests
           if [ $(git status --porcelain | wc -l) -eq "0" ]; then
@@ -237,7 +237,7 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git config pull.ff only
+          git config pull.rebase true
           git pull
           git add manifests
           if [ $(git status --porcelain | wc -l) -eq "0" ]; then
@@ -341,7 +341,7 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git config pull.ff only
+          git config pull.rebase true
           git pull
           git add manifests
           if [ $(git status --porcelain | wc -l) -eq "0" ]; then
