@@ -142,49 +142,45 @@ jobs:
           # merge into a single main one
           #jq -s 'reduce .[] as $item ({}; .cassandra.docker += $item)' manifests/cassandra/docker/*.json > manifest.json
 
-      - name: Commit manifest
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add manifests
-          if [ $(git status --porcelain | wc -l) -eq "0" ]; then
-            echo "No changes to commit"
-            exit 0
-          fi
-          git pull
-          git commit -m "Add manifest for ${{ matrix.version }} [skip ci]"
-
-      - name: Push changes
-        uses: ad-m/github-push-action@master
+      - name: Cache manifest files
+        id: cache-manifests
+        uses: actions/cache@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
+          path: manifests/cassandra/docker/*.json
+          key: ${{ runner.os }}-${{ hashFiles('manifests/cassandra/docker/*.json') }}
 
-  build41:
-    name: Build containers for Cassandra 4.0
-    runs-on: ubuntu-latest
-    needs: [prepare]
-    strategy:
-      matrix:
-        version: ${{ fromJSON(needs.prepare.outputs.versions41) }}
-    steps: *docker_steps
+  # build41:
+  #   name: Build containers for Cassandra 4.0
+  #   runs-on: ubuntu-latest
+  #   needs: [prepare]
+  #   strategy:
+  #     matrix:
+  #       version: ${{ fromJSON(needs.prepare.outputs.versions41) }}
+  #   steps: *docker_steps
 
-  build40:
-    name: Build containers for Cassandra 4.1
-    runs-on: ubuntu-latest
-    needs: [prepare]
-    strategy:
-      matrix:
-        version: ${{ fromJSON(needs.prepare.outputs.versions40) }}
-    steps: *docker_steps
+  # build40:
+  #   name: Build containers for Cassandra 4.1
+  #   runs-on: ubuntu-latest
+  #   needs: [prepare]
+  #   strategy:
+  #     matrix:
+  #       version: ${{ fromJSON(needs.prepare.outputs.versions40) }}
+  #   steps: *docker_steps
 
   commit:
     name: Commit manifests
     runs-on: ubuntu-latest
-    needs: [build40,build41,build50]
+    #needs: [build40,build41,build50]
+    needs: [build50]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - uses: actions/cache/restore@v4
+        id: cache
+        with:
+          path: manifests/cassandra/docker
+          key: ${{ runner.os }}-${{ hashFiles('manifests/cassandra/docker/*.json') }}
 
       - name: Commit manifest
         run: |
