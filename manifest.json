@@ -112,7 +112,7 @@
         "repo": "ghcr.io/axonops/cassandra:5.0.1"
       },
       "5.0.2": {
-        "digest": "sha256:0bda4cff4972e63c2ce8dd41d23a55d24f410835b8638b0ed14226e3f223ef01",
+        "digest": "sha256:0de0cec59f9e9db47b084386a4b4c2937f9e2c13967a638768d862b33ee3c910",
         "tag": "5.0.2",
         "repo": "ghcr.io/axonops/cassandra:5.0.2"
       }
