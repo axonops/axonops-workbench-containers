@@ -144,12 +144,10 @@ jobs:
 
       - name: Commit manifest
         run: |
-          jq -s 'reduce .[] as $item ({}; .cassandra.docker += $item)' manifests/cassandra/docker/*.json > manifest.json
-
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git pull
-          git add manifests manifest.json
+          git add manifests
           if [ $(git status --porcelain | wc -l) -eq "0" ]; then
             echo "No changes to commit"
             exit 0
