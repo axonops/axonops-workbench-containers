@@ -144,9 +144,10 @@ jobs:
 
       - name: Commit manifest
         run: |
+          set -x
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git config pull.rebase false
+          git config pull.rebase true
 
           retry_count=0
           while [ $retry_count -lt 8 ]; do
