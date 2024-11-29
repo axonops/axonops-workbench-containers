@@ -153,13 +153,12 @@ jobs:
           while [ $retry_count -lt 8 ]; do
             git add manifests
             git commit -m "Add manifest [skip ci]"
-
-            git stash && git pull --rebase && git stash pop
-              
             if [ $(git status --porcelain | wc -l) -eq "0" ]; then
               echo "No changes to commit"
               exit 0
             fi
+            
+            git stash && git pull --rebase && git stash pop
 
             if git push; then
               break
