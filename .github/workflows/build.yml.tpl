@@ -58,7 +58,7 @@ jobs:
       - run: echo '${{ steps.cassandra_versions.outputs.versions50 }}' | jq -r .
 
   build50:
-    name: Build
+    name: Cassandra
     runs-on: ubuntu-latest
     needs: [prepare]
     strategy:
@@ -161,7 +161,10 @@ jobs:
               break
             fi
             sleep 5
-            git pull
+            if ! git pull; then
+              git add manifests
+              git commit -m "Add manifest [skip ci]"
+            fi
             retry_count=$((retry_count + 1))
           done
 
@@ -173,7 +176,7 @@ jobs:
           branch: ${{ github.ref }}
 
   build41:
-    name: Build
+    name: Cassandra
     runs-on: ubuntu-latest
     needs: [prepare]
     strategy:
@@ -182,7 +185,7 @@ jobs:
     steps: *docker_steps
 
   build40:
-    name: Build
+    name: Cassandra
     runs-on: ubuntu-latest
     needs: [prepare]
     strategy:
