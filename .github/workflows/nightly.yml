@@ -44,6 +44,6 @@ jobs:
           sbom: true
           file: cassandra/5.1-nightly/Dockerfile
           tags: |
-            ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.setup.outputs.CASSANDRA_VERSION }}
+            ghcr.io/${{ env.REPO_OWNER }}/cassandra:latest
           labels: |
             LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
