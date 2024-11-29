@@ -147,7 +147,7 @@ jobs:
           set -x
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git config pull.rebase true
+          git config pull.rebase false
 
           retry_count=0
           while [ $retry_count -lt 8 ]; do
@@ -155,7 +155,7 @@ jobs:
             git commit -m "Add manifest [skip ci]"
 
             if ! git pull; then
-              git pull --rebase
+              git pull
               continue
             fi
               
