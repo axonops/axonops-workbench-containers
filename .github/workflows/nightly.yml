@@ -29,6 +29,10 @@ jobs:
           registry: "ghcr.io"
           username: "${{ github.actor }}"
           password: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Prepare AxonOps Workbench Dockerfile
+        id: setup
+        run: |
+          cp axonops-entrypoint.sh cassandra/5.1-nightly
       - name: Build the Apache Cassandra image
         uses: docker/build-push-action@v4
         id: build
