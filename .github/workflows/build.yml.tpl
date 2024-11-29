@@ -146,7 +146,7 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git config pull.rebase true
+          git config pull.rebase false
           git pull
           git add manifests
           if [ $(git status --porcelain | wc -l) -eq "0" ]; then
