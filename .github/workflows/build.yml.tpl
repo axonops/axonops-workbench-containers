@@ -121,6 +121,7 @@ jobs:
           push: true
           pull: true
           sbom: true
+          cache-from: ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.setup.outputs.CASSANDRA_VERSION }}
           file: ${{ steps.setup.outputs.context }}/Dockerfile
           tags: |
             ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.setup.outputs.CASSANDRA_VERSION }}
@@ -216,3 +217,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
+
+# vim: ft=yaml

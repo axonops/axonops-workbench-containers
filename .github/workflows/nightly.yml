@@ -47,6 +47,7 @@ jobs:
           push: true
           pull: true
           sbom: true
+          cache-from: ghcr.io/${{ env.REPO_OWNER }}/cassandra:latest
           file: cassandra/5.1-nightly/Dockerfile
           tags: |
             ghcr.io/${{ env.REPO_OWNER }}/cassandra:latest
