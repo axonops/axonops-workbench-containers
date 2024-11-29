@@ -154,10 +154,7 @@ jobs:
             git add manifests
             git commit -m "Add manifest [skip ci]"
 
-            if ! git pull; then
-              git pull
-              continue
-            fi
+            git stash && git pull --rebase && git stash pop
               
             if [ $(git status --porcelain | wc -l) -eq "0" ]; then
               echo "No changes to commit"

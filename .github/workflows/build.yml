@@ -130,7 +130,7 @@ jobs:
           # merge into a single main one
           #jq -s 'reduce .[] as $item ({}; .cassandra.docker += $item)' manifests/cassandra/docker/*.json > manifest.json
       - name: Commit manifest
-        run: "set -x\ngit config --local user.email \"github-actions[bot]@users.noreply.github.com\"\ngit config --local user.name \"github-actions[bot]\"\ngit config pull.rebase false\n\nretry_count=0\nwhile [ $retry_count -lt 8 ]; do\n  git add manifests\n  git commit -m \"Add manifest [skip ci]\"\n\n  if ! git pull; then\n    git pull\n    continue\n  fi\n    \n  if [ $(git status --porcelain | wc -l) -eq \"0\" ]; then\n    echo \"No changes to commit\"\n    exit 0\n  fi\n\n  if git push; then\n    break\n  fi\n  sleep 5\n  if ! git pull; then\n    git add manifests\n    git commit -m \"Add manifest [skip ci]\"\n  fi\n  retry_count=$((retry_count + 1))\ndone\n"
+        run: "set -x\ngit config --local user.email \"github-actions[bot]@users.noreply.github.com\"\ngit config --local user.name \"github-actions[bot]\"\ngit config pull.rebase false\n\nretry_count=0\nwhile [ $retry_count -lt 8 ]; do\n  git add manifests\n  git commit -m \"Add manifest [skip ci]\"\n\n  git stash && git pull --rebase && git stash pop\n    \n  if [ $(git status --porcelain | wc -l) -eq \"0\" ]; then\n    echo \"No changes to commit\"\n    exit 0\n  fi\n\n  if git push; then\n    break\n  fi\n  sleep 5\n  if ! git pull; then\n    git add manifests\n    git commit -m \"Add manifest [skip ci]\"\n  fi\n  retry_count=$((retry_count + 1))\ndone\n"
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
@@ -214,7 +214,7 @@ jobs:
           # merge into a single main one
           #jq -s 'reduce .[] as $item ({}; .cassandra.docker += $item)' manifests/cassandra/docker/*.json > manifest.json
       - name: Commit manifest
-        run: "set -x\ngit config --local user.email \"github-actions[bot]@users.noreply.github.com\"\ngit config --local user.name \"github-actions[bot]\"\ngit config pull.rebase false\n\nretry_count=0\nwhile [ $retry_count -lt 8 ]; do\n  git add manifests\n  git commit -m \"Add manifest [skip ci]\"\n\n  if ! git pull; then\n    git pull\n    continue\n  fi\n    \n  if [ $(git status --porcelain | wc -l) -eq \"0\" ]; then\n    echo \"No changes to commit\"\n    exit 0\n  fi\n\n  if git push; then\n    break\n  fi\n  sleep 5\n  if ! git pull; then\n    git add manifests\n    git commit -m \"Add manifest [skip ci]\"\n  fi\n  retry_count=$((retry_count + 1))\ndone\n"
+        run: "set -x\ngit config --local user.email \"github-actions[bot]@users.noreply.github.com\"\ngit config --local user.name \"github-actions[bot]\"\ngit config pull.rebase false\n\nretry_count=0\nwhile [ $retry_count -lt 8 ]; do\n  git add manifests\n  git commit -m \"Add manifest [skip ci]\"\n\n  git stash && git pull --rebase && git stash pop\n    \n  if [ $(git status --porcelain | wc -l) -eq \"0\" ]; then\n    echo \"No changes to commit\"\n    exit 0\n  fi\n\n  if git push; then\n    break\n  fi\n  sleep 5\n  if ! git pull; then\n    git add manifests\n    git commit -m \"Add manifest [skip ci]\"\n  fi\n  retry_count=$((retry_count + 1))\ndone\n"
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
@@ -298,7 +298,7 @@ jobs:
           # merge into a single main one
           #jq -s 'reduce .[] as $item ({}; .cassandra.docker += $item)' manifests/cassandra/docker/*.json > manifest.json
       - name: Commit manifest
-        run: "set -x\ngit config --local user.email \"github-actions[bot]@users.noreply.github.com\"\ngit config --local user.name \"github-actions[bot]\"\ngit config pull.rebase false\n\nretry_count=0\nwhile [ $retry_count -lt 8 ]; do\n  git add manifests\n  git commit -m \"Add manifest [skip ci]\"\n\n  if ! git pull; then\n    git pull\n    continue\n  fi\n    \n  if [ $(git status --porcelain | wc -l) -eq \"0\" ]; then\n    echo \"No changes to commit\"\n    exit 0\n  fi\n\n  if git push; then\n    break\n  fi\n  sleep 5\n  if ! git pull; then\n    git add manifests\n    git commit -m \"Add manifest [skip ci]\"\n  fi\n  retry_count=$((retry_count + 1))\ndone\n"
+        run: "set -x\ngit config --local user.email \"github-actions[bot]@users.noreply.github.com\"\ngit config --local user.name \"github-actions[bot]\"\ngit config pull.rebase false\n\nretry_count=0\nwhile [ $retry_count -lt 8 ]; do\n  git add manifests\n  git commit -m \"Add manifest [skip ci]\"\n\n  git stash && git pull --rebase && git stash pop\n    \n  if [ $(git status --porcelain | wc -l) -eq \"0\" ]; then\n    echo \"No changes to commit\"\n    exit 0\n  fi\n\n  if git push; then\n    break\n  fi\n  sleep 5\n  if ! git pull; then\n    git add manifests\n    git commit -m \"Add manifest [skip ci]\"\n  fi\n  retry_count=$((retry_count + 1))\ndone\n"
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
