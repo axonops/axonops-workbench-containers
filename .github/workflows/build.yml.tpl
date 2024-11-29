@@ -157,7 +157,7 @@ jobs:
               echo "No changes to commit"
               exit 0
             fi
-            
+
             git stash && git pull --rebase && git stash pop
 
             if git push; then
@@ -170,13 +170,6 @@ jobs:
             fi
             retry_count=$((retry_count + 1))
           done
-
-
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
 
   build41:
     name: Cassandra
