@@ -1,0 +1,49 @@
+---
+name: Nightly Build Containers
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "1 14 * * *"
+defaults:
+  run:
+    shell: bash
+jobs:
+  nightly:
+    name: Cassandra Nightly
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: "Get docker info"
+        run: |
+          echo "Actor: ${{ github.actor }}"
+          echo "REPO_OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+      - name: "Log into GitHub Container Registry"
+        if: "github.event_name != 'pull_request'"
+        uses: "docker/login-action@v1"
+        with:
+          registry: "ghcr.io"
+          username: "${{ github.actor }}"
+          password: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Build the Apache Cassandra image
+        uses: docker/build-push-action@v4
+        id: build
+        with:
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            VERSION=5.1-SNAPSHOT
+            GitCommit=${{ github.sha }}
+            MAJOR_VERSION=5.1
+          context: cassandra/5.1-nightly
+          push: true
+          pull: true
+          sbom: true
+          file: cassandra/5.1-nightly/Dockerfile
+          tags: |
+            ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.setup.outputs.CASSANDRA_VERSION }}
+          labels: |
+            LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
