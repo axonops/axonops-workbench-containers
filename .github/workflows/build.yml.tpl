@@ -147,16 +147,22 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git config pull.rebase false
-          git pull
-          git add manifests
-          if [ $(git status --porcelain | wc -l) -eq "0" ]; then
-            echo "No changes to commit"
-            exit 0
-          fi
-          git commit -m "Add manifest [skip ci]"
 
           retry_count=0
-          while [ $retry_count -lt 4 ]; do
+          while [ $retry_count -lt 8 ]; do
+            git add manifests
+            git commit -m "Add manifest [skip ci]"
+
+            if ! git pull; then
+              git pull --rebase
+              continue
+            fi
+              
+            if [ $(git status --porcelain | wc -l) -eq "0" ]; then
+              echo "No changes to commit"
+              exit 0
+            fi
+
             if git push; then
               break
             fi
