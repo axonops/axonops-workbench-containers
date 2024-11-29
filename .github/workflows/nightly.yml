@@ -22,6 +22,7 @@ jobs:
         run: |
           echo "Actor: ${{ github.actor }}"
           echo "REPO_OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          echo "TIMESTAMP=$(date +'%s')" >> $GITHUB_ENV
       - name: "Log into GitHub Container Registry"
         if: "github.event_name != 'pull_request'"
         uses: "docker/login-action@v1"
@@ -51,3 +52,29 @@ jobs:
             ghcr.io/${{ env.REPO_OWNER }}/cassandra:latest
           labels: |
             LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
+      - name: Generate manitest
+        run: |
+          mkdir -p manifests/cassandra/docker
+
+          REPO=ghcr.io/${{ env.REPO_OWNER }}/cassandra:latest
+
+          jq -n \
+            --argjson "${{ env.TIMESTAMP }}" "$(jq -n --arg digest '${{ steps.build.outputs.digest }}' --arg tag 'latest' --arg repo "$REPO" '$ARGS.named')" \
+            '$ARGS.named' > manifests/cassandra/docker/latest.json
+          jq -s 'reduce .[] as $item ({}; .cassandra.docker += $item)' manifests/cassandra/docker/*.json > manifest.json
+      - name: Commit manifest
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git pull
+          git add manifests manifest.json
+          if [ $(git status --porcelain | wc -l) -eq "0" ]; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Add nightly manifest [skip ci]"
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}

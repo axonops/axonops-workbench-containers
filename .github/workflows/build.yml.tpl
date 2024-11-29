@@ -129,8 +129,6 @@ jobs:
 
       - name: Generate manitest
         run: |
-          set -x
-
           mkdir -p manifests/cassandra/docker
 
           REPO=ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ matrix.version }}
@@ -144,7 +142,6 @@ jobs:
 
       - name: Commit manifest
         run: |
-          set -x
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git config pull.rebase false
