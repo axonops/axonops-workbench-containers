@@ -166,7 +166,7 @@ VOLUME /var/lib/cassandra
 COPY docker-entrypoint.sh /usr/local/bin/
 
 ENV AXON_AGENT_LOG_OUTPUT=std
-ENV MAJOR_VERSION=4.0
+ENV MAJOR_VERSION=4.1
 
 RUN AGENT_VER=$(echo "$CASSANDRA_VERSION" | sed -r 's/^([0-9]+\.[0-9]+).*$/\1/') && \
     groupadd --gid 9988 axonops && \
