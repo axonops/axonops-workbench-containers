@@ -90,47 +90,16 @@ ENV GPG_KEYS \
 # Berenguer Blasi (Code Signing Key) <bereng@apache.org>
 	CEC5C50B9C629EF0F5AB2706650B72EB14CCD622
 
-ENV CASSANDRA_VERSION 5.0.2
+ENV CASSANDRA_VERSION 5.1-SNAPSHOT
 ENV CASSANDRA_SHA512 51478b18b8bce82a6b4915f31470d031306724041a4f2b684fd17635f8a5a9802594c0bbc3d0154cfa52d87a253d7868636985787aa1e3e00136259302689363
 
 RUN set -eux; \
-	savedAptMark="$(apt-mark showmanual)"; \
+	lastRelease=$(curl -s https://nightlies.apache.org/cassandra/Cassandra-trunk/ | tail -3| grep img | awk '{print $5}' | cut -d= -f2 | cut -d / -f 1 | sed 's/"//g'); \
+	releaseBin="https://nightlies.apache.org/cassandra/Cassandra-trunk/${lastRelease}/artifacts/jdk11/amd64/apache-cassandra-5.1-SNAPSHOT-bin.tar.gz"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends ca-certificates gnupg wget; \
 	rm -rf /var/lib/apt/lists/*; \
-	\
-	ddist() { \
-		local f="$1"; shift; \
-		local distFile="$1"; shift; \
-		local success=; \
-		local distUrl=; \
-		for distUrl in \
-# https://github.com/docker-library/tomcat/pull/308
-			https://dlcdn.apache.org/ \
-# if the version is outdated, we have to pull from the archive
-			https://archive.apache.org/dist/ \
-		; do \
-			if wget --progress=dot:giga -O "$f" "$distUrl$distFile" && [ -s "$f" ]; then \
-				success=1; \
-				break; \
-			fi; \
-		done; \
-		[ -n "$success" ]; \
-	}; \
-	\
-	ddist 'cassandra-bin.tgz' "cassandra/$CASSANDRA_VERSION/apache-cassandra-$CASSANDRA_VERSION-bin.tar.gz"; \
-	echo "$CASSANDRA_SHA512 *cassandra-bin.tgz" | sha512sum --check --strict -; \
-	\
-	ddist 'cassandra-bin.tgz.asc' "cassandra/$CASSANDRA_VERSION/apache-cassandra-$CASSANDRA_VERSION-bin.tar.gz.asc"; \
-	export GNUPGHOME="$(mktemp -d)"; \
-	for key in $GPG_KEYS; do \
-		gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$key"; \
-	done; \
-	gpg --batch --verify cassandra-bin.tgz.asc cassandra-bin.tgz; \
-	rm -rf "$GNUPGHOME"; \
-	\
-	apt-mark auto '.*' > /dev/null; \
-	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark > /dev/null; \
+	curl -L $releaseBin -o cassandra-bin.tgz; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
 	\
 	mkdir -p "$CASSANDRA_HOME"; \
@@ -175,16 +144,16 @@ EXPOSE 7000 7001 7199 9042 9160
 
 ENV AXON_AGENT_LOG_OUTPUT=std
 ENV MAJOR_VERSION=5.0
+ENV AGENT_VER=5.0
 
-RUN AGENT_VER=$(echo "$CASSANDRA_VERSION" | sed -r 's/^([0-9]+\.[0-9]+).*$/\1/') && \
-    groupadd --gid 9988 axonops && \
+RUN groupadd --gid 9988 axonops && \
     useradd --gid 9988 --uid 9988 --shell /bin/bash -c "AxonOps" -G cassandra axonops && \
     usermod -aG axonops cassandra && \
     apt-get -y update && apt-get -y install curl gnupg netcat-openbsd && \
     curl https://packages.axonops.com/apt/repo-signing-key.gpg | apt-key add - && \
     echo "deb https://packages.axonops.com/apt axonops-apt main" >/etc/apt/sources.list.d/axonops-apt.list && \
     apt-get -y update && \
-    apt-get -y install axon-cassandra${AGENT_VER}-agent && \
+    apt-get -y install axon-cassandra${AGENT_VER}-agent-jdk11 && \
     apt-get -y clean && \
     echo 'axon-agent:' > /etc/axonops/axon-agent.yml && \
     chown cassandra:cassandra /etc/axonops/axon-agent.yml && \
