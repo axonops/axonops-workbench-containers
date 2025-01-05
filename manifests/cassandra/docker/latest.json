@@ -1,6 +1,6 @@
 {
-  "1735999621": {
-    "digest": "sha256:9e91a14d5e9acad143c82793740891e01fb5e1c84f615968986be1a7b7772952",
+  "1736086017": {
+    "digest": "sha256:0825c78fb39a6996a640b1975b4ceef41830b839d892646e053b77e4f2f9dbb8",
     "tag": "latest",
     "repo": "ghcr.io/axonops/cassandra:latest"
   }
