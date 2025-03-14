@@ -94,7 +94,7 @@ ENV CASSANDRA_VERSION 5.1-SNAPSHOT
 ENV CASSANDRA_SHA512 51478b18b8bce82a6b4915f31470d031306724041a4f2b684fd17635f8a5a9802594c0bbc3d0154cfa52d87a253d7868636985787aa1e3e00136259302689363
 
 RUN set -eux; \
-	lastRelease=$(curl -s https://nightlies.apache.org/cassandra/Cassandra-trunk/ | tail -3| grep img | awk '{print $5}' | cut -d= -f2 | cut -d / -f 1 | sed 's/"//g'); \
+	lastRelease=$(curl -s https://nightlies.apache.org/cassandra/Cassandra-trunk/ | grep img | grep DIR | cut -d= -f4 | awk -F '"' '{print $2}' | grep -v ^$ | sed 's$/$$g' | tail -1) \
 	releaseBin="https://nightlies.apache.org/cassandra/Cassandra-trunk/${lastRelease}/artifacts/jdk11/amd64/apache-cassandra-5.1-SNAPSHOT-bin.tar.gz"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends ca-certificates gnupg wget; \
