@@ -14,6 +14,7 @@ fi
 
 touch /var/log/axonops/axon-agent.log
 chown axonops:axonops /var/log/axonops/axon-agent.log
+echo ". /usr/share/axonops/axonops-jvm.options" >> $CASSANDRA_CONF/cassandra-env.sh
 su axonops -c "/usr/share/axonops/axon-agent $AXON_AGENT_ARGS" &
 
 exec /usr/local/bin/docker-entrypoint.sh "$@"

@@ -191,8 +191,6 @@ RUN AGENT_VER=$(echo "$CASSANDRA_VERSION" | sed -r 's/^([0-9]+\.[0-9]+).*$/\1/')
     chmod 0400 /etc/axonops/axon-agent.yml && \
     touch /var/run/utmp
 
-ENV JVM_EXTRA_OPTS="-javaagent:/usr/share/axonops/axon-cassandra${MAJOR_VERSION}-agent.jar=/etc/axonops/axon-agent.yml"
-
 COPY axonops-entrypoint.sh /axonops-entrypoint.sh
 RUN chown root:root /axonops-entrypoint.sh && chmod 0755 /axonops-entrypoint.sh
 
