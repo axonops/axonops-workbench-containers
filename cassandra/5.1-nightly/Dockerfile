@@ -160,8 +160,6 @@ RUN groupadd --gid 9988 axonops && \
     chmod 0400 /etc/axonops/axon-agent.yml && \
     touch /var/run/utmp
 
-ENV JVM_EXTRA_OPTS="-javaagent:/usr/share/axonops/axon-cassandra${MAJOR_VERSION}-agent.jar=/etc/axonops/axon-agent.yml"
-
 COPY axonops-entrypoint.sh /axonops-entrypoint.sh
 RUN chown root:root /axonops-entrypoint.sh && chmod 0755 /axonops-entrypoint.sh
 
