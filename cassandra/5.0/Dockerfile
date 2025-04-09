@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM eclipse-temurin:11-jre-jammy
+FROM eclipse-temurin:17-jre-jammy
 
 # explicitly set user/group IDs
 RUN set -eux; \
@@ -184,7 +184,7 @@ RUN AGENT_VER=$(echo "$CASSANDRA_VERSION" | sed -r 's/^([0-9]+\.[0-9]+).*$/\1/')
     curl https://packages.axonops.com/apt/repo-signing-key.gpg | apt-key add - && \
     echo "deb https://packages.axonops.com/apt axonops-apt main" >/etc/apt/sources.list.d/axonops-apt.list && \
     apt-get -y update && \
-    apt-get -y install axon-cassandra${AGENT_VER}-agent-jdk11 && \
+    apt-get -y install axon-cassandra${AGENT_VER}-agent-jdk17 && \
     apt-get -y clean && \
     echo 'axon-agent:' > /etc/axonops/axon-agent.yml && \
     chown cassandra:cassandra /etc/axonops/axon-agent.yml && \
