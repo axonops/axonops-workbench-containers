@@ -1,6 +1,6 @@
 {
   "4.1.4": {
-    "digest": "sha256:16092730c02a3ff93bee286dd45e840d1fd5a8f0b0c7f5663a4357169f3928f2",
+    "digest": "sha256:1e981b2c89f8d1be451f2d79ab858d1459595f8d93aeb1ad12f915b3e9752365",
     "tag": "4.1.4",
     "repo": "ghcr.io/axonops/cassandra:4.1.4"
   }
