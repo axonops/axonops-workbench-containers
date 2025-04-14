@@ -60,6 +60,10 @@ jobs:
       matrix:
         version: ${{ fromJSON(needs.prepare.outputs.versions50) }}
     steps:
+      - name: Set up Docker Buildx
+        run: |
+          docker buildx create --use
+          docker buildx inspect --bootstrap
       - name: Checkout code
         uses: actions/checkout@v2
       # - name: Set up QEMU
@@ -159,6 +163,10 @@ jobs:
       matrix:
         version: ${{ fromJSON(needs.prepare.outputs.versions41) }}
     steps:
+      - name: Set up Docker Buildx
+        run: |
+          docker buildx create --use
+          docker buildx inspect --bootstrap
       - name: Checkout code
         uses: actions/checkout@v2
       # - name: Set up QEMU
@@ -258,6 +266,10 @@ jobs:
       matrix:
         version: ${{ fromJSON(needs.prepare.outputs.versions40) }}
     steps:
+      - name: Set up Docker Buildx
+        run: |
+          docker buildx create --use
+          docker buildx inspect --bootstrap
       - name: Checkout code
         uses: actions/checkout@v2
       # - name: Set up QEMU
