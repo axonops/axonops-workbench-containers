@@ -13,7 +13,7 @@ defaults:
 jobs:
   prepare:
     name: Get Cassandra versions
-    runs-on: self-hosted
+    runs-on: ubuntu-22.04
     outputs:
       versions50: ${{ steps.cassandra_versions.outputs.versions50 }}
       versions40: ${{ steps.cassandra_versions.outputs.versions40 }}
@@ -54,7 +54,7 @@ jobs:
       - run: echo '${{ steps.cassandra_versions.outputs.versions50 }}' | jq -r .
   build50:
     name: Cassandra
-    runs-on: self-hosted
+    runs-on: ubuntu-22.04
     needs: [prepare]
     strategy:
       matrix:
@@ -157,7 +157,7 @@ jobs:
           done
   build41:
     name: Cassandra
-    runs-on: self-hosted
+    runs-on: ubuntu-22.04
     needs: [prepare]
     strategy:
       matrix:
@@ -260,7 +260,7 @@ jobs:
           done
   build40:
     name: Cassandra
-    runs-on: self-hosted
+    runs-on: ubuntu-22.04
     needs: [prepare]
     strategy:
       matrix:
@@ -363,7 +363,7 @@ jobs:
           done
   commit:
     name: Create manifest.json
-    runs-on: self-hosted
+    runs-on: ubuntu-22.04
     needs: [build40, build41, build50]
     #needs: [build50]
     steps:
