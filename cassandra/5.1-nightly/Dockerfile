@@ -163,9 +163,12 @@ ENV AGENT_VER=5.0
 RUN groupadd --gid 9988 axonops 
 RUN useradd --gid 9988 --uid 9988 --shell /bin/bash -c "AxonOps" -G cassandra axonops 
 RUN usermod -aG axonops cassandra 
-RUN apt-get -y update && apt-get -y install curl gnupg netcat-openbsd 
-RUN curl https://packages.axonops.com/apt/repo-signing-key.gpg | apt-key add - 
-RUN echo "deb https://packages.axonops.com/apt axonops-apt main" > /etc/apt/sources.list.d/axonops-apt.list 
+RUN apt-get -y update && apt-get -y install curl gnupg netcat-openbsd
+RUN mkdir -p /etc/apt/keyrings
+RUN curl -fsSL https://packages.axonops.com/apt/repo-signing-key.gpg | gpg --dearmor -o /etc/apt/keyrings/axonops.gpg
+RUN echo "deb [signed-by=/etc/apt/keyrings/axonops.gpg] https://packages.axonops.com/apt axonops-apt main" | tee /etc/apt/sources.list.d/axonops-apt.list > /dev/null
+# RUN curl https://packages.axonops.com/apt/repo-signing-key.gpg | apt-key add - 
+# RUN echo "deb https://packages.axonops.com/apt axonops-apt main" > /etc/apt/sources.list.d/axonops-apt.list 
 RUN apt-get -y update 
 RUN apt-get -y install axon-cassandra${AGENT_VER}-agent-jdk17 
 RUN apt-get -y clean 
