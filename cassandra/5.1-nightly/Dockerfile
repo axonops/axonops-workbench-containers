@@ -165,7 +165,7 @@ RUN useradd --gid 9988 --uid 9988 --shell /bin/bash -c "AxonOps" -G cassandra ax
 RUN usermod -aG axonops cassandra 
 RUN apt-get -y update && apt-get -y install curl gnupg netcat-openbsd
 RUN mkdir -p /etc/apt/keyrings
-RUN curl -fsSL https://packages.axonops.com/apt/repo-signing-key.gpg | gpg --dearmor -o /etc/apt/keyrings/axonops.gpg
+RUN curl -fsSL -A "Mozilla/5.0 (X11; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0" https://packages.axonops.com/apt/repo-signing-key.gpg | gpg --dearmor -o /etc/apt/keyrings/axonops.gpg
 RUN echo "deb [signed-by=/etc/apt/keyrings/axonops.gpg] https://packages.axonops.com/apt axonops-apt main" | tee /etc/apt/sources.list.d/axonops-apt.list > /dev/null
 # RUN curl https://packages.axonops.com/apt/repo-signing-key.gpg | apt-key add - 
 # RUN echo "deb https://packages.axonops.com/apt axonops-apt main" > /etc/apt/sources.list.d/axonops-apt.list 
