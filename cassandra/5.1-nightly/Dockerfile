@@ -160,23 +160,19 @@ ENV AGENT_VER=5.0
 #     chmod 0400 /etc/axonops/axon-agent.yml && \
 #     touch /var/run/utmp
 
-RUN groupadd --gid 9988 axonops 
-RUN useradd --gid 9988 --uid 9988 --shell /bin/bash -c "AxonOps" -G cassandra axonops 
-RUN usermod -aG axonops cassandra 
-RUN apt-get -y update && apt-get -y install curl gnupg netcat-openbsd
-RUN mkdir -p /etc/apt/keyrings
-RUN curl -fsSL https://packages.axonops.com/apt/repo-signing-key.gpg | gpg --dearmor -o /etc/apt/keyrings/axonops.gpg
-RUN echo "deb [signed-by=/etc/apt/keyrings/axonops.gpg] https://packages.axonops.com/apt axonops-apt main" | tee /etc/apt/sources.list.d/axonops-apt.list > /dev/null
-# RUN curl https://packages.axonops.com/apt/repo-signing-key.gpg | apt-key add - 
-# RUN echo "deb https://packages.axonops.com/apt axonops-apt main" > /etc/apt/sources.list.d/axonops-apt.list 
-RUN apt-get -y update 
-RUN apt-get -y install axon-cassandra${AGENT_VER}-agent-jdk17 
-RUN apt-get -y clean 
-RUN echo 'axon-agent:' > /etc/axonops/axon-agent.yml 
-RUN chown cassandra:cassandra /etc/axonops/axon-agent.yml 
-RUN chmod 0400 /etc/axonops/axon-agent.yml 
-RUN touch /var/run/utmp
-
+RUN groupadd --gid 9988 axonops && \
+    useradd --gid 9988 --uid 9988 --shell /bin/bash -c "AxonOps" -G cassandra axonops && \
+    usermod -aG axonops cassandra && \
+    apt-get -y update && apt-get -y install curl gnupg netcat-openbsd && \
+    curl -fsSL https://packages.axonops.com/apt/repo-signing-key.gpg | gpg --dearmor -o /etc/apt/keyrings/axonops.gpg && \
+    echo "deb [signed-by=/etc/apt/keyrings/axonops.gpg] https://packages.axonops.com/apt axonops-apt main" | tee /etc/apt/sources.list.d/axonops-apt.list > /dev/null && \
+    apt-get -y update && \
+    apt-get -y install axon-cassandra${AGENT_VER}-agent-jdk17 && \
+    apt-get -y clean && \
+    echo 'axon-agent:' > /etc/axonops/axon-agent.yml && \
+    chown cassandra:cassandra /etc/axonops/axon-agent.yml && \
+    chmod 0400 /etc/axonops/axon-agent.yml && \
+    touch /var/run/utmp
 
 COPY axonops-entrypoint.sh /axonops-entrypoint.sh
 RUN chown root:root /axonops-entrypoint.sh && chmod 0755 /axonops-entrypoint.sh
