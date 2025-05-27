@@ -114,7 +114,8 @@ jobs:
           push: true
           pull: true
           sbom: true
-          cache-from: ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.setup.outputs.CASSANDRA_VERSION }}
+          cache-from: ghcr.io/${{ env.REPO_OWNER }}/cassandra:buildcache-${{ steps.setup.outputs.CASSANDRA_VERSION }}
+          cache-to: type=gha,mode=max,ref=ghcr.io/${{ env.REPO_OWNER }}/cassandra:buildcache-${{ steps.setup.outputs.CASSANDRA_VERSION }}
           file: ${{ steps.setup.outputs.context }}/Dockerfile
           tags: |
             ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.setup.outputs.CASSANDRA_VERSION }}
@@ -217,7 +218,8 @@ jobs:
           push: true
           pull: true
           sbom: true
-          cache-from: ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.setup.outputs.CASSANDRA_VERSION }}
+          cache-from: ghcr.io/${{ env.REPO_OWNER }}/cassandra:buildcache-${{ steps.setup.outputs.CASSANDRA_VERSION }}
+          cache-to: type=gha,mode=max,ref=ghcr.io/${{ env.REPO_OWNER }}/cassandra:buildcache-${{ steps.setup.outputs.CASSANDRA_VERSION }}
           file: ${{ steps.setup.outputs.context }}/Dockerfile
           tags: |
             ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.setup.outputs.CASSANDRA_VERSION }}
@@ -320,7 +322,8 @@ jobs:
           push: true
           pull: true
           sbom: true
-          cache-from: ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.setup.outputs.CASSANDRA_VERSION }}
+          cache-from: ghcr.io/${{ env.REPO_OWNER }}/cassandra:buildcache-${{ steps.setup.outputs.CASSANDRA_VERSION }}
+          cache-to: type=gha,mode=max,ref=ghcr.io/${{ env.REPO_OWNER }}/cassandra:buildcache-${{ steps.setup.outputs.CASSANDRA_VERSION }}
           file: ${{ steps.setup.outputs.context }}/Dockerfile
           tags: |
             ghcr.io/${{ env.REPO_OWNER }}/cassandra:${{ steps.setup.outputs.CASSANDRA_VERSION }}
