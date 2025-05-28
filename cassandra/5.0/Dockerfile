@@ -67,6 +67,12 @@ ENV GPG_KEYS \
 	CEC86BB4A0BA9D0F90397CAEF8358FA2F2833C93 \
 # Eric Evans <eevans@sym-link.com>
 	C4965EE9E3015D192CCCF2B6F758CE318D77295D \
+# Sylvain Lebresne (pcmanus) <sylvain@datastax.com>
+	5AED1BF378E9A19DADE1BCB34BD736A82B5C1B00 \
+# T Jake Luciani <jake@apache.org>
+	514A2AD631A57A16DD0047EC749D6EEC0353B12C \
+# Michael Shuler <michael@pbandjelly.org>
+	A26E528B271F19B9E5D8E19EA278B781FE4B2BDA \
 # Michael Semb Wever <mick@thelastpickle.com>
 	A4C465FEA0C552561A392A61E91335D77E3E87CB \
 # Alex Petrov <oleksandr.petrov@gmail.com>
@@ -82,19 +88,7 @@ ENV GPG_KEYS \
 # Stefan Miklosovic <smiklosovic@apache.org>
 	7464AAD9068241C50BA6A26232F35CB2F546D93E \
 # Berenguer Blasi (Code Signing Key) <bereng@apache.org>
-	CEC5C50B9C629EF0F5AB2706650B72EB14CCD622 \
-# Dinesh A. Joshi <djoshi@apache.org>
-	53371F9B1B425A336988B6A03B6042413D323470 \
-# Bret McGuire (ASF) <absurdfarce@apache.org>
-	498AAC354AA5CB36FAAB7608B6E83A2D2E447E56 \
-# Doug Rohrer (RSA CODE SIGNING KEY) <jeetkundoug@apache.org>
-	9A648E3DEDA36EECCCC374C4277B602ED2C52277 \
-# Andrew Tolbert (CODE SIGNING KEY) <tolbertam@apache.org>
-	7CD7917D5AEE43D27242DF4680083B749CE192F5 \
-# Francisco Guerrero <frankgh@apache.org>
-	FDD846E1F36085380D823193DFCB6EEAC588E28D \
-# Francisco Guerrero (CODE SIGNING KEY) <frankgh@apache.org>
-	E92471BE57E8CD9B85E292FB5822297F68AE605F
+	CEC5C50B9C629EF0F5AB2706650B72EB14CCD622
 
 ENV CASSANDRA_VERSION 5.0.2
 ENV CASSANDRA_SHA512 51478b18b8bce82a6b4915f31470d031306724041a4f2b684fd17635f8a5a9802594c0bbc3d0154cfa52d87a253d7868636985787aa1e3e00136259302689363
@@ -187,6 +181,7 @@ RUN AGENT_VER=$(echo "$CASSANDRA_VERSION" | sed -r 's/^([0-9]+\.[0-9]+).*$/\1/')
     useradd --gid 9988 --uid 9988 --shell /bin/bash -c "AxonOps" -G cassandra axonops && \
     usermod -aG axonops cassandra && \
     apt-get -y update && apt-get -y install curl gnupg netcat-openbsd && \
+    mkdir -p /etc/apt/keyrings && \
     curl -fsSL https://packages.axonops.com/apt/repo-signing-key.gpg | gpg --dearmor -o /etc/apt/keyrings/axonops.gpg && \
     echo "deb [signed-by=/etc/apt/keyrings/axonops.gpg] https://packages.axonops.com/apt axonops-apt main" | tee /etc/apt/sources.list.d/axonops-apt.list > /dev/null && \
     apt-get -y update && \
