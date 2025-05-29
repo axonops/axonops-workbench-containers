@@ -173,6 +173,7 @@ RUN AGENT_VER=$(echo "$CASSANDRA_VERSION" | sed -r 's/^([0-9]+\.[0-9]+).*$/\1/')
     useradd --gid 9988 --uid 9988 --shell /bin/bash -c "AxonOps" -G cassandra axonops && \
     usermod -aG axonops cassandra && \
     apt-get -y update && apt-get -y install curl gnupg netcat-openbsd && \
+    mkdir -p /etc/apt/keyrings && \
     curl -fsSL https://packages.axonops.com/apt/repo-signing-key.gpg | gpg --dearmor -o /etc/apt/keyrings/axonops.gpg && \
     echo "deb [signed-by=/etc/apt/keyrings/axonops.gpg] https://packages.axonops.com/apt axonops-apt main" | tee /etc/apt/sources.list.d/axonops-apt.list > /dev/null && \
     apt-get -y update && \

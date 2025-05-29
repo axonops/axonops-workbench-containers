@@ -13,7 +13,7 @@ defaults:
 jobs:
   prepare:
     name: Get Cassandra versions
-    runs-on: ubuntu-22.04
+    runs-on: self-hosted
     outputs:
       versions50: ${{ steps.cassandra_versions.outputs.versions50 }}
       versions40: ${{ steps.cassandra_versions.outputs.versions40 }}
@@ -53,8 +53,8 @@ jobs:
           echo "${delimiter}" >> "${GITHUB_OUTPUT}"
       - run: echo '${{ steps.cassandra_versions.outputs.versions50 }}' | jq -r .
   build50:
-    name: Cassandra
-    runs-on: ubuntu-22.04
+    name: Cassandra 5.0
+    runs-on: self-hosted
     needs: [prepare]
     strategy:
       matrix:
@@ -157,8 +157,8 @@ jobs:
             retry_count=$((retry_count + 1))
           done
   build41:
-    name: Cassandra
-    runs-on: ubuntu-22.04
+    name: Cassandra 4.1
+    runs-on: self-hosted
     needs: [prepare, build50]
     strategy:
       matrix:
@@ -261,8 +261,8 @@ jobs:
             retry_count=$((retry_count + 1))
           done
   build40:
-    name: Cassandra
-    runs-on: ubuntu-22.04
+    name: Cassandra 4.0
+    runs-on: self-hosted
     needs: [prepare, build41]
     strategy:
       matrix:
@@ -366,7 +366,7 @@ jobs:
           done
   commit:
     name: Create manifest.json
-    runs-on: ubuntu-22.04
+    runs-on: self-hosted
     needs: [build50, build41, build40]
     steps:
       - name: Checkout code
