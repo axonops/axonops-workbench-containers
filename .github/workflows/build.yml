@@ -19,16 +19,52 @@ jobs:
       versions40: ${{ steps.cassandra_versions.outputs.versions40 }}
       versions41: ${{ steps.cassandra_versions.outputs.versions41 }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
       - name: Get versions
         id: cassandra_versions
         run: |
           archive_url="https://archive.apache.org/dist/cassandra/"
           url="https://downloads.apache.org/cassandra/"
 
+          # Get existing versions from manifest.json
+          existing_versions=""
+          if [ -f "manifest.json" ]; then
+            existing_versions=$(jq -r '.cassandra.docker | keys[]' manifest.json 2>/dev/null || echo "")
+          fi
+
           # Use curl to fetch the HTML content and grep to filter 4.x versions
-          versions40=$(curl -s $archive_url | grep -E '4\.0\.[0-9]+/' | awk '{print $5}'|cut -d \> -f2 | sed 's$/</a$$g' | sort | jq -R -c -s 'split("\n")[:-1]')
-          versions41=$(curl -s $archive_url | grep -E '4\.1\.[0-9]+/' | awk '{print $5}'|cut -d \> -f2 | sed 's$/</a$$g' | sort | jq -R -c -s 'split("\n")[:-1]')
-          versions50=$(curl -s $archive_url | grep -E '5\.0\.[0-9]+/' | awk '{print $5}'|cut -d \> -f2 | sed 's$/</a$$g' | sort | jq -R -c -s 'split("\n")[:-1]')
+          versions40_all=$(curl -s $archive_url | grep -E '4\.0\.[0-9]+/' | awk '{print $5}'|cut -d \> -f2 | sed 's$/</a$$g' | sort)
+          versions41_all=$(curl -s $archive_url | grep -E '4\.1\.[0-9]+/' | awk '{print $5}'|cut -d \> -f2 | sed 's$/</a$$g' | sort)
+          versions50_all=$(curl -s $archive_url | grep -E '5\.0\.[0-9]+/' | awk '{print $5}'|cut -d \> -f2 | sed 's$/</a$$g' | sort)
+
+          # Filter out already-built versions
+          versions40=$(echo "$versions40_all" | while read -r v; do
+            if [ -n "$v" ] && ! echo "$existing_versions" | grep -q "^${v}$"; then
+              echo "$v"
+            fi
+          done | jq -R -s -c 'split("\n") | map(select(length > 0))')
+
+          versions41=$(echo "$versions41_all" | while read -r v; do
+            if [ -n "$v" ] && ! echo "$existing_versions" | grep -q "^${v}$"; then
+              echo "$v"
+            fi
+          done | jq -R -s -c 'split("\n") | map(select(length > 0))')
+
+          versions50=$(echo "$versions50_all" | while read -r v; do
+            if [ -n "$v" ] && ! echo "$existing_versions" | grep -q "^${v}$"; then
+              echo "$v"
+            fi
+          done | jq -R -s -c 'split("\n") | map(select(length > 0))')
+
+          # Log what versions are being skipped
+          echo "Existing versions in manifest.json:"
+          echo "$existing_versions" | head -20
+          echo "..."
+          echo "New versions to build:"
+          echo "4.0: $(echo $versions40 | jq -r '.[]' | tr '\n' ' ')"
+          echo "4.1: $(echo $versions41 | jq -r '.[]' | tr '\n' ' ')"
+          echo "5.0: $(echo $versions50 | jq -r '.[]' | tr '\n' ' ')"
 
           all_versions=$(jq -c -n --argjson "5.0" $versions50 --argjson "4.0" $versions40 --argjson "4.1" $versions41 '$ARGS.named')
 
@@ -56,6 +92,7 @@ jobs:
     name: Cassandra 5.0
     runs-on: self-hosted
     needs: [prepare]
+    if: needs.prepare.outputs.versions50 != '[]'
     strategy:
       matrix:
         version: ${{ fromJSON(needs.prepare.outputs.versions50) }}
@@ -159,7 +196,11 @@ jobs:
   build41:
     name: Cassandra 4.1
     runs-on: self-hosted
-    needs: [prepare, build50]
+    needs: [prepare]
+    if: |
+      always() && 
+      needs.prepare.result == 'success' &&
+      needs.prepare.outputs.versions41 != '[]'
     strategy:
       matrix:
         version: ${{ fromJSON(needs.prepare.outputs.versions41) }}
@@ -263,7 +304,11 @@ jobs:
   build40:
     name: Cassandra 4.0
     runs-on: self-hosted
-    needs: [prepare, build41]
+    needs: [prepare]
+    if: |
+      always() && 
+      needs.prepare.result == 'success' &&
+      needs.prepare.outputs.versions40 != '[]'
     strategy:
       matrix:
         version: ${{ fromJSON(needs.prepare.outputs.versions40) }}
@@ -367,7 +412,14 @@ jobs:
   commit:
     name: Create manifest.json
     runs-on: self-hosted
-    needs: [build50, build41, build40]
+    needs: [prepare, build50, build41, build40]
+    if: |
+      always() && 
+      needs.prepare.result == 'success' &&
+      (needs.build50.result == 'success' || needs.build50.result == 'skipped') &&
+      (needs.build41.result == 'success' || needs.build41.result == 'skipped') &&
+      (needs.build40.result == 'success' || needs.build40.result == 'skipped') &&
+      (needs.build50.result == 'success' || needs.build41.result == 'success' || needs.build40.result == 'success')
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
