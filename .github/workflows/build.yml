@@ -68,7 +68,7 @@ jobs:
           done | jq -R -s -c 'split("\n") | map(select(length > 0))')
 
           # Log what versions are being skipped
-          echo "Existing versions in manifest.json from branch $BRANCH_NAME:"
+          echo "Existing versions in manifest.json:"
           echo "$existing_versions" | head -20
           echo "..."
           echo "New versions to build:"
@@ -441,11 +441,11 @@ jobs:
       - name: Commit manifest
         run: |
           jq -s 'reduce .[] as $item ({}; .cassandra.docker += $item)' manifests/cassandra/docker/*.json > manifest.json
-
+          cat manifests.json
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git pull
-          git add manifests manifest.json
+          git add -f manifests manifest.json
           if [ $(git status --porcelain | wc -l) -eq "0" ]; then
             echo "No changes to commit"
             exit 0
