@@ -13,7 +13,7 @@ defaults:
 jobs:
   prepare:
     name: Get Cassandra versions
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     outputs:
       versions50: ${{ steps.cassandra_versions.outputs.versions50 }}
       versions40: ${{ steps.cassandra_versions.outputs.versions40 }}
@@ -90,7 +90,7 @@ jobs:
       - run: echo '${{ steps.cassandra_versions.outputs.versions50 }}' | jq -r .
   build50:
     name: Cassandra 5.0
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: [prepare]
     if: needs.prepare.outputs.versions50 != '[]'
     strategy:
@@ -103,10 +103,10 @@ jobs:
           docker buildx inspect --bootstrap
       - name: Checkout code
         uses: actions/checkout@v2
-      # - name: Set up QEMU
-      #   uses: docker/setup-qemu-action@v3
-      # - name: Set up Docker Buildx
-      #   uses: docker/setup-buildx-action@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - name: "Get docker info"
         run: |
           echo "Actor: ${{ github.actor }}"
@@ -195,7 +195,7 @@ jobs:
           done
   build41:
     name: Cassandra 4.1
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: [prepare]
     if: |
       always() && 
@@ -303,7 +303,7 @@ jobs:
           done
   build40:
     name: Cassandra 4.0
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: [prepare]
     if: |
       always() && 
@@ -411,7 +411,7 @@ jobs:
           done
   commit:
     name: Create manifest.json
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: [prepare, build50, build41, build40]
     if: |
       always() && 
