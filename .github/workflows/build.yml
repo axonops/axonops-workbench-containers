@@ -29,8 +29,18 @@ jobs:
 
           # Get existing versions from manifest.json
           existing_versions=""
-          if [ -f "manifest.json" ]; then
-            existing_versions=$(jq -r '.cassandra.docker | keys[]' manifest.json 2>/dev/null || echo "")
+          # Fetch manifest.json from the current branch in GitHub
+          BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          echo "Fetching manifest.json from branch: $BRANCH_NAME"
+          
+          if curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Accept: application/vnd.github.raw" \
+               "https://api.github.com/repos/${{ github.repository }}/contents/manifest.json?ref=${BRANCH_NAME}" \
+               -o /tmp/manifest.json 2>/dev/null; then
+            existing_versions=$(jq -r '.cassandra.docker | keys[]' /tmp/manifest.json 2>/dev/null || echo "")
+            echo "Found existing manifest.json in branch $BRANCH_NAME"
+          else
+            echo "No manifest.json found in branch $BRANCH_NAME, will build all versions"
           fi
 
           # Use curl to fetch the HTML content and grep to filter 4.x versions
@@ -58,7 +68,7 @@ jobs:
           done | jq -R -s -c 'split("\n") | map(select(length > 0))')
 
           # Log what versions are being skipped
-          echo "Existing versions in manifest.json:"
+          echo "Existing versions in manifest.json from branch $BRANCH_NAME:"
           echo "$existing_versions" | head -20
           echo "..."
           echo "New versions to build:"
