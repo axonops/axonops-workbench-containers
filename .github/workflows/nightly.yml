@@ -10,7 +10,7 @@ defaults:
 jobs:
   nightly:
     name: Cassandra Nightly
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -48,6 +48,7 @@ jobs:
           pull: true
           sbom: true
           cache-from: ghcr.io/${{ env.REPO_OWNER }}/cassandra:latest
+          cache-to: type=gha,mode=max,ref=ghcr.io/${{ env.REPO_OWNER }}/cassandra:latest
           file: cassandra/5.1-nightly/Dockerfile
           tags: |
             ghcr.io/${{ env.REPO_OWNER }}/cassandra:latest

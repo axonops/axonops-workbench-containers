@@ -14,7 +14,7 @@ fi
 
 touch /var/log/axonops/axon-agent.log
 chown axonops:axonops /var/log/axonops/axon-agent.log
-if [[ "${CASSANDRA_VERSION}" =~ ^5\.* ]]; then
+if [ -f /usr/share/axonops/axonops-jvm.options ]; then
   echo ". /usr/share/axonops/axonops-jvm.options" >> $CASSANDRA_CONF/cassandra-env.sh
 fi
 su axonops -c "/usr/share/axonops/axon-agent $AXON_AGENT_ARGS" &
