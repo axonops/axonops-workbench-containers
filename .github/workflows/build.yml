@@ -127,8 +127,11 @@ jobs:
   build50:
     name: Cassandra 5.0
     runs-on: ubuntu-latest
-    needs: [prepare]
-    if: needs.prepare.outputs.versions50 != '[]'
+    needs: [prepare, validate-existing]
+    if: |
+      always() && 
+      needs.prepare.result == 'success' &&
+      needs.prepare.outputs.versions50 != '[]'
     strategy:
       max-parallel: 1
       matrix:
