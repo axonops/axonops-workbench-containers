@@ -51,6 +51,11 @@
         "tag": "4.0.17",
         "repo": "ghcr.io/axonops/cassandra:4.0.17"
       },
+      "4.0.18": {
+        "digest": "sha256:d765fb9bfb3a82835ce9e686361b9f5bdd0cc02eede94abc2b493e65e5a07be6",
+        "tag": "4.0.18",
+        "repo": "ghcr.io/axonops/cassandra:4.0.18"
+      },
       "4.0.2": {
         "digest": "sha256:f885ac38951b8b14e075fec9ad131450e82b36a054967d031eab09437aab6b22",
         "tag": "4.0.2",
@@ -160,6 +165,11 @@
         "digest": "sha256:dd3e1b960a606e6ca57ceb3fc9bc5ecfe8c8bb08b052864f0362314d7c83d8b0",
         "tag": "5.0.3",
         "repo": "ghcr.io/axonops/cassandra:5.0.3"
+      },
+      "5.0.4": {
+        "digest": "sha256:ee2e068b2e526abd1ab2a33847e4f427939570ea0306c262698c0fc8cab2a5ea",
+        "tag": "5.0.4",
+        "repo": "ghcr.io/axonops/cassandra:5.0.4"
       },
       "1748516410": {
         "digest": "sha256:dcbac844ca3e81765d378b88a6bc267616be7b0fe8ee24b362ff3566b897cfdb",
