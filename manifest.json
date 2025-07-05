@@ -96,6 +96,56 @@
         "tag": "4.0.9",
         "repo": "ghcr.io/axonops/cassandra:4.0.9"
       },
+      "4.1.0": {
+        "digest": "sha256:2b9232cdfe8fd02329307ea8977b37321200c1261cc30352bdbdb8745dc55b53",
+        "tag": "4.1.0",
+        "repo": "ghcr.io/axonops/cassandra:4.1.0"
+      },
+      "4.1.1": {
+        "digest": "sha256:f35d2bb1e9277515a8c44d895fab4de82d5f3b2ab7feb2942c7e50da1f608114",
+        "tag": "4.1.1",
+        "repo": "ghcr.io/axonops/cassandra:4.1.1"
+      },
+      "4.1.2": {
+        "digest": "sha256:d1d0dc55d24c2a4b6759e0756c4451c28181d731d2909ca190bd7d097601e04c",
+        "tag": "4.1.2",
+        "repo": "ghcr.io/axonops/cassandra:4.1.2"
+      },
+      "4.1.3": {
+        "digest": "sha256:2424f6712e59955a038329301c2aa39331558cf7528cda6c44501b30a692194c",
+        "tag": "4.1.3",
+        "repo": "ghcr.io/axonops/cassandra:4.1.3"
+      },
+      "4.1.4": {
+        "digest": "sha256:56f9967f6867e66941070929f4c6fd9290f8b67699f378e53edaaff7a1380f10",
+        "tag": "4.1.4",
+        "repo": "ghcr.io/axonops/cassandra:4.1.4"
+      },
+      "4.1.5": {
+        "digest": "sha256:c9cc22ba0e98acff2f4aa58d3d69d14303dd71b0f2141a802b30909ea9bbed61",
+        "tag": "4.1.5",
+        "repo": "ghcr.io/axonops/cassandra:4.1.5"
+      },
+      "4.1.6": {
+        "digest": "sha256:3f8fae1dd1e7e5d21a0c744f18c9e7e098fce6da863e145c17c59556498db754",
+        "tag": "4.1.6",
+        "repo": "ghcr.io/axonops/cassandra:4.1.6"
+      },
+      "4.1.7": {
+        "digest": "sha256:547e17033f3a2da4ff72ea922ca440fadc58bc28c152e2fbbbe259a6a5d1bdd5",
+        "tag": "4.1.7",
+        "repo": "ghcr.io/axonops/cassandra:4.1.7"
+      },
+      "4.1.8": {
+        "digest": "sha256:9f9aa63427ceb18925a09f8577cd9d93a9f6e92bd3577af50add50d816db6984",
+        "tag": "4.1.8",
+        "repo": "ghcr.io/axonops/cassandra:4.1.8"
+      },
+      "4.1.9": {
+        "digest": "sha256:c605efbea3e4862491e75e9f23486ff37e6ec14f58e562599c3ca25f9dc2ae3f",
+        "tag": "4.1.9",
+        "repo": "ghcr.io/axonops/cassandra:4.1.9"
+      },
       "5.0.0": {
         "digest": "sha256:982f6d9e6214f5b71511051006ac388ed96f599349affdfd5a9506d4605e3804",
         "tag": "5.0.0",
