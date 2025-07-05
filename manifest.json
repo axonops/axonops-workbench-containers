@@ -1,6 +1,101 @@
 {
   "cassandra": {
     "docker": {
+      "4.0.0": {
+        "digest": "sha256:c34e598e493e6f7e05577eef93e883df23df2dab9aecdfadc504a7712fbb1b0b",
+        "tag": "4.0.0",
+        "repo": "ghcr.io/axonops/cassandra:4.0.0"
+      },
+      "4.0.1": {
+        "digest": "sha256:23b31646e1082282c17d5c1d2bfb0d15b53cc7be8fdd721fffb1f81693a54211",
+        "tag": "4.0.1",
+        "repo": "ghcr.io/axonops/cassandra:4.0.1"
+      },
+      "4.0.10": {
+        "digest": "sha256:1338604dca4a2b34b68b836566acba02c23d5bff31c65467d8a679f040e2e121",
+        "tag": "4.0.10",
+        "repo": "ghcr.io/axonops/cassandra:4.0.10"
+      },
+      "4.0.11": {
+        "digest": "sha256:117a39568f6331310e06fd09464b167e0908add1cdd2e01b3eec9fa595443777",
+        "tag": "4.0.11",
+        "repo": "ghcr.io/axonops/cassandra:4.0.11"
+      },
+      "4.0.12": {
+        "digest": "sha256:eb6007ae1acc03a2baf67192a413aa4a8f2b16d81a56e7f155df42b175ff8029",
+        "tag": "4.0.12",
+        "repo": "ghcr.io/axonops/cassandra:4.0.12"
+      },
+      "4.0.13": {
+        "digest": "sha256:7a02207f28d88ae7a9a9ccee091c4d8bb1dcfded0bf388125718a87c0fdafc1a",
+        "tag": "4.0.13",
+        "repo": "ghcr.io/axonops/cassandra:4.0.13"
+      },
+      "4.0.14": {
+        "digest": "sha256:57fc26724491451908661c6457e0a0d9b43df6a6ccb59f24f51872cf9bcba1cc",
+        "tag": "4.0.14",
+        "repo": "ghcr.io/axonops/cassandra:4.0.14"
+      },
+      "4.0.15": {
+        "digest": "sha256:93e9d681bc573a87666d4b1a1b2a33214fbebfcce8e7d6cee29c2392dec2082b",
+        "tag": "4.0.15",
+        "repo": "ghcr.io/axonops/cassandra:4.0.15"
+      },
+      "4.0.16": {
+        "digest": "sha256:c497efc18ac34bc64285236eb0fc89182cace32d5f147af184ebcc7bdd7b7519",
+        "tag": "4.0.16",
+        "repo": "ghcr.io/axonops/cassandra:4.0.16"
+      },
+      "4.0.17": {
+        "digest": "sha256:1074a3583488f1a5ee63c156000c8147f5a79dab52e5873d524df56cff83e6bd",
+        "tag": "4.0.17",
+        "repo": "ghcr.io/axonops/cassandra:4.0.17"
+      },
+      "4.0.18": {
+        "digest": "sha256:253f0ebd3114a287c5c5ff6aa71c22086423b8e8670e2a7f5b6a0c8c746b891b",
+        "tag": "4.0.18",
+        "repo": "ghcr.io/axonops/cassandra:4.0.18"
+      },
+      "4.0.2": {
+        "digest": "sha256:8e2b35fcb7c5e287379e61ebf733e49f3121df5355e1accd3f210adf77eb1f07",
+        "tag": "4.0.2",
+        "repo": "ghcr.io/axonops/cassandra:4.0.2"
+      },
+      "4.0.3": {
+        "digest": "sha256:aae98caec03c13f58395c52c4a963aa969abc55cdac915312592cb4fbce056ab",
+        "tag": "4.0.3",
+        "repo": "ghcr.io/axonops/cassandra:4.0.3"
+      },
+      "4.0.4": {
+        "digest": "sha256:11f488d8c0da74e94e28af95e68892850c69002428a23301b4b7fbc6528ccf78",
+        "tag": "4.0.4",
+        "repo": "ghcr.io/axonops/cassandra:4.0.4"
+      },
+      "4.0.5": {
+        "digest": "sha256:ee4b3114026878db09b86c1674e13ae06673ec0f44f49ddecbeb8d44b7aac72f",
+        "tag": "4.0.5",
+        "repo": "ghcr.io/axonops/cassandra:4.0.5"
+      },
+      "4.0.6": {
+        "digest": "sha256:69a5e9a9b57351c57aafaf93f0f4151e81a77ca48eb0528dcae698e379282a88",
+        "tag": "4.0.6",
+        "repo": "ghcr.io/axonops/cassandra:4.0.6"
+      },
+      "4.0.7": {
+        "digest": "sha256:c8b9c68fd7e1008f4e7ba496b1d0549fe97b213733c73634cd94a7c8c40a9c55",
+        "tag": "4.0.7",
+        "repo": "ghcr.io/axonops/cassandra:4.0.7"
+      },
+      "4.0.8": {
+        "digest": "sha256:ee2c05128552c8cd2999f7ea2b471c863c7f7e72169cf04c60a1a1d0538ac4d2",
+        "tag": "4.0.8",
+        "repo": "ghcr.io/axonops/cassandra:4.0.8"
+      },
+      "4.0.9": {
+        "digest": "sha256:67748743997b193b7adf7541c49d89f22bd8250af55924d4cad75387fd312ebf",
+        "tag": "4.0.9",
+        "repo": "ghcr.io/axonops/cassandra:4.0.9"
+      },
       "4.1.0": {
         "digest": "sha256:2b9232cdfe8fd02329307ea8977b37321200c1261cc30352bdbdb8745dc55b53",
         "tag": "4.1.0",
