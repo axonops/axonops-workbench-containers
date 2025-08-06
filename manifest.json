@@ -171,6 +171,11 @@
         "tag": "5.0.4",
         "repo": "ghcr.io/axonops/cassandra:5.0.4"
       },
+      "5.0.5": {
+        "digest": "sha256:8d1f0de8b1bdf2cc9d6082626183755e4a82dee0312b7a75d6602a59d272ca6c",
+        "tag": "5.0.5",
+        "repo": "ghcr.io/axonops/cassandra:5.0.5"
+      },
       "1754316688": {
         "digest": "sha256:e0c87169d8ffb54878c2782a84a0ada01a70375bf407e10caa70418aee522c62",
         "tag": "latest",
