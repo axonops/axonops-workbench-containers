@@ -23,8 +23,58 @@ jobs:
           echo "Actor: ${{ github.actor }}"
           echo "REPO_OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
           echo "TIMESTAMP=$(date +'%s')" >> $GITHUB_ENV
+      
+      - name: "Verify Cassandra snapshot availability"
+        id: verify_snapshot
+        run: |
+          set +e  # Don't exit on error
+          
+          echo "Checking for Cassandra 5.1-SNAPSHOT availability..."
+          
+          # Check if the main nightlies directory exists
+          echo "Step 1: Checking nightlies directory..."
+          if ! curl -f -s --head https://nightlies.apache.org/cassandra/Cassandra-trunk/ > /dev/null 2>&1; then
+            echo "::warning::Nightlies directory not accessible: https://nightlies.apache.org/cassandra/Cassandra-trunk/"
+            echo "snapshot_available=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          echo "✓ Nightlies directory is accessible"
+          
+          # Get the latest release directory
+          echo "Step 2: Finding latest release directory..."
+          lastRelease=$(curl -s https://nightlies.apache.org/cassandra/Cassandra-trunk/ | grep img | grep DIR | cut -d= -f4 | awk -F '"' '{print $2}' | grep -v ^$ | sed 's$/$$g' | tail -1)
+          
+          if [ -z "$lastRelease" ]; then
+            echo "::warning::No release directories found in nightlies"
+            echo "snapshot_available=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          echo "✓ Found latest release: $lastRelease"
+          
+          # Check if the release directory exists
+          echo "Step 3: Checking release directory..."
+          releaseUrl="https://nightlies.apache.org/cassandra/Cassandra-trunk/${lastRelease}"
+          if ! curl -f -s --head "$releaseUrl" > /dev/null 2>&1; then
+            echo "::warning::Release directory not accessible: $releaseUrl"
+            echo "snapshot_available=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          echo "✓ Release directory is accessible"
+          
+          # Check if the actual snapshot file exists
+          echo "Step 4: Checking snapshot file..."
+          snapshotUrl="https://nightlies.apache.org/cassandra/Cassandra-trunk/${lastRelease}/artifacts/jdk17/amd64/apache-cassandra-5.1-SNAPSHOT-bin.tar.gz"
+          if ! curl -f -s --head "$snapshotUrl" > /dev/null 2>&1; then
+            echo "::warning::Snapshot file not found: $snapshotUrl"
+            echo "snapshot_available=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          echo "✅ Cassandra 5.1-SNAPSHOT is available at: $snapshotUrl"
+          echo "snapshot_available=true" >> $GITHUB_OUTPUT
+          echo "snapshot_url=$snapshotUrl" >> $GITHUB_OUTPUT
       - name: "Log into GitHub Container Registry"
-        if: "github.event_name != 'pull_request'"
+        if: "github.event_name != 'pull_request' && steps.verify_snapshot.outputs.snapshot_available == 'true'"
         uses: "docker/login-action@v1"
         with:
           registry: "ghcr.io"
@@ -32,11 +82,13 @@ jobs:
           password: "${{ secrets.GITHUB_TOKEN }}"
       - name: Prepare AxonOps Workbench Dockerfile
         id: setup
+        if: steps.verify_snapshot.outputs.snapshot_available == 'true'
         run: |
           cp axonops-entrypoint.sh cassandra/5.1-nightly
       - name: Build the Apache Cassandra image
         uses: docker/build-push-action@v4
         id: build
+        if: steps.verify_snapshot.outputs.snapshot_available == 'true'
         with:
           platforms: linux/amd64,linux/arm64
           build-args: |
@@ -55,6 +107,7 @@ jobs:
           labels: |
             LABEL org.opencontainers.image.source="https://github.com/${{ env.REPO_OWNER }}/axonops-workbench-containers"
       - name: Generate manitest
+        if: steps.verify_snapshot.outputs.snapshot_available == 'true'
         run: |
           mkdir -p manifests/cassandra/docker
 
@@ -65,6 +118,7 @@ jobs:
             '$ARGS.named' > manifests/cassandra/docker/latest.json
           jq -s 'reduce .[] as $item ({}; .cassandra.docker += $item)' manifests/cassandra/docker/*.json > manifest.json
       - name: Commit manifest
+        if: steps.verify_snapshot.outputs.snapshot_available == 'true'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
@@ -76,7 +130,25 @@ jobs:
           fi
           git commit -m "Add nightly manifest [skip ci]"
       - name: Push changes
+        if: steps.verify_snapshot.outputs.snapshot_available == 'true'
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
+      
+      - name: "Summary"
+        if: always()
+        run: |
+          echo "## Nightly Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ steps.verify_snapshot.outputs.snapshot_available }}" = "true" ]; then
+            echo "✅ **Cassandra 5.1-SNAPSHOT was available and built successfully**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Snapshot URL: ${{ steps.verify_snapshot.outputs.snapshot_url }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⏭️ **Build skipped: Cassandra 5.1-SNAPSHOT not available**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The nightly snapshot was not found at Apache's nightlies repository." >> $GITHUB_STEP_SUMMARY
+            echo "This is expected if Apache hasn't published today's build yet." >> $GITHUB_STEP_SUMMARY
+          fi

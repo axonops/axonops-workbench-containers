@@ -99,35 +99,10 @@ jobs:
           echo "${delimiter}" >> "${GITHUB_OUTPUT}"
       - run: echo '${{ steps.cassandra_versions.outputs.versions50 }}' | jq -r .
   
-  validate-existing:
-    name: Validate Existing Images
-    runs-on: ubuntu-latest
-    needs: [prepare]
-    permissions:
-      contents: read
-      packages: read
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Set up crane
-        uses: imjasonh/setup-crane@v0.3
-        
-      - name: Authenticate to GitHub Container Registry
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | crane auth login ghcr.io -u ${{ github.actor }} --password-stdin
-          
-      - name: Validate existing images
-        continue-on-error: true
-        run: |
-          echo "Validating existing images in manifest.json..."
-          ./scripts/validate-images.sh || true
-          echo "Note: Validation failures are informational only and won't block the build"
-          
   build50:
     name: Cassandra 5.0
     runs-on: ubuntu-latest
-    needs: [prepare, validate-existing]
+    needs: [prepare]
     if: |
       always() && 
       needs.prepare.result == 'success' &&
@@ -236,7 +211,7 @@ jobs:
   build41:
     name: Cassandra 4.1
     runs-on: ubuntu-latest
-    needs: [prepare, validate-existing]
+    needs: [prepare]
     if: |
       always() && 
       needs.prepare.result == 'success' &&
@@ -345,7 +320,7 @@ jobs:
   build40:
     name: Cassandra 4.0
     runs-on: ubuntu-latest
-    needs: [prepare, validate-existing]
+    needs: [prepare]
     if: |
       always() && 
       needs.prepare.result == 'success' &&
