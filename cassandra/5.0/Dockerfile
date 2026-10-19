@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM eclipse-temurin:17-jre-jammy
+FROM eclipse-temurin:17-jre-noble
 
 # explicitly set user/group IDs
 RUN set -eux; \
@@ -35,7 +35,7 @@ RUN set -eux; \
 
 # grab gosu for easy step-down from root
 # https://github.com/tianon/gosu/releases
-ENV GOSU_VERSION 1.17
+ENV GOSU_VERSION 1.19
 RUN set -eux; \
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
@@ -90,8 +90,8 @@ ENV GPG_KEYS \
 # Berenguer Blasi (Code Signing Key) <bereng@apache.org>
 	CEC5C50B9C629EF0F5AB2706650B72EB14CCD622
 
-ENV CASSANDRA_VERSION 5.0.2
-ENV CASSANDRA_SHA512 51478b18b8bce82a6b4915f31470d031306724041a4f2b684fd17635f8a5a9802594c0bbc3d0154cfa52d87a253d7868636985787aa1e3e00136259302689363
+ENV CASSANDRA_VERSION 5.0.9
+ENV CASSANDRA_SHA512 beaf3df6342ef1a0ccc83fa80214f250b32c35cfbb1af591b00e3fd539eef0915bc3b89f0e7ae73f6d50cbb03f6075c4e4cf32d3c46ff9c33f745542fcc925df
 
 RUN set -eux; \
 	savedAptMark="$(apt-mark showmanual)"; \
