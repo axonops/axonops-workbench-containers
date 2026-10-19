@@ -1,0 +1,7 @@
+{
+  "5.0.7": {
+    "digest": "sha256:5f092a33a545876ee454eac621936e3801115fd52cee9a2a4d1753aacaeb913c",
+    "tag": "5.0.7",
+    "repo": "ghcr.io/axonops/cassandra:5.0.7"
+  }
+}
